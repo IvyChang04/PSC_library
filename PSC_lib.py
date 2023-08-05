@@ -14,6 +14,12 @@ import pickle
 import os
 from sklearn.utils.fixes import threadpool_limits
 
+"""
+TODO:
+- add other clustering methods
+- function comments(documentation)
+"""
+
 
 class Net(nn.Module):
     def __init__(self, n_feature, n_hidden1, n_hidden2, n_hidden3, n_output):
