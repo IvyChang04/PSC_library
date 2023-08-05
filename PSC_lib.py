@@ -12,6 +12,7 @@ from sklearn.decomposition import PCA
 from scipy.optimize import linear_sum_assignment
 import pickle
 import os
+from sklearn.utils.fixes import threadpool_limits
 
 
 class Net(nn.Module):
@@ -140,6 +141,7 @@ class PSC:
 
                 if saving_path is not None:
                     torch.save(self.model.state_dict(), saving_path)
+                    self.name = saving_path
                     with open(self.name, 'wb') as f:
                         pickle.dump(self.model, f)
                     # self.model_exist = True
@@ -149,12 +151,9 @@ class PSC:
         if isinstance(self.clustering, str) and self.clustering == "kmeans":
             kmeans = KMeans(n_clusters=self.k, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
             cluster = kmeans.fit(U)
+            self.cluster = cluster
 
-        elif isinstance(self.clustering, str) and self.clustering == "dbscan":
-            dbscan = DBSCAN()
-            cluster = dbscan.fit(U)
-
-        return cluster
+        return self
 
         """
         digits = load_digits()
@@ -164,27 +163,28 @@ class PSC:
         """
 
     def fit_predict(self, X, saving_path = None):
-        return self.fit(X, saving_path).labels_
+        return self.fit(X, saving_path).cluster.labels_
 
     # predict the closest cluster
-    def predict(self, X, sample_weight = 'deprecate'):
+    def predict(self, X, model = None):
+
+        if self.__check_file_exist(model) is False:
+            ValueError(
+                f"model {model} does not exist"
+            )
+        elif model is None:
+            ValueError(
+                "model cannot be None"
+            )
+
+        with open(self.name, 'rb') as f:
+                self.model = pickle.load(f)
+
         x = torch.from_numpy(X).type(torch.FloatTensor)
-        u = torch.from_numpy(self.__spectral_clustering(X)).type(torch.FloatTensor)
-        dataset = torch.utils.data.TensorDataset(x, u)
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size = 50, shuffle = True)
-        self.dataloader = dataloader
-
-        for _ in range(self.epochs):
-            loss = self.__train()
-            if(loss < 0.00015):
-                break
-
         U = self.model(x).detach().numpy()
 
         if isinstance(self.clustering, str) and self.clustering == "kmeans":
-            kmeans = KMeans(n_clusters=self.k, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-            cluster = kmeans.predict(U)
-
+            return self.cluster.predict(U)
 
     def set_model(self, self_defined_model):
         self.model = self_defined_model
@@ -195,9 +195,13 @@ def main():
     X = digits.data/16
 
     # saving_path = "Spectraal_Clustering"
-    cluster_index = PSC().fit_predict(X)
+    # cluster_index = PSC().fit_predict(X)
 
-    print(cluster_index)
+    clust = PSC().fit(X, saving_path='test')
+    print(type(clust))
+    clust.predict(X, model = 'test')
+
+    print(clust.cluster.cluster_centers_)
 
 if __name__ == "__main__":
     main()
