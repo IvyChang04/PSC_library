@@ -18,7 +18,7 @@ from sklearn.utils.fixes import threadpool_limits
 TODO:
 - add other clustering methods
 - function comments(documentation) 
-    almost dont. need to check examples
+    almost dont. need to check examples.
 """
 
 
