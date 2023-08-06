@@ -17,11 +17,49 @@ from sklearn.utils.fixes import threadpool_limits
 """
 TODO:
 - add other clustering methods
-- function comments(documentation)
+- function comments(documentation) 
+    almost dont. need to check examples
 """
 
 
 class Net(nn.Module):
+    """The model used to learn the embedding.
+    
+    Parameters
+    ----------
+    n_feature : int
+        The number of input features.
+    n_hidden1 : int
+        The number of neurons in the first hidden layer.
+    n_hidden2 : int
+        The number of neurons in the second hidden layer.
+    n_hidden3 : int
+        The number of neurons in the third hidden layer.
+    n_output : int
+        The number of output features.
+    
+    Attributes
+    ----------
+    hidden1 : torch.nn.Linear
+        The first hidden layer.
+    hidden2 : torch.nn.Linear
+        The second hidden layer.
+    hidden3 : torch.nn.Linear
+        The third hidden layer.
+    predict : torch.nn.Linear
+        The output layer.
+    
+    Examples
+    --------
+    >>> model = Net(64, 128, 256, 64, 10)
+    >>> print(model)
+    Net(
+        (hidden1): Linear(in_features=64, out_features=128, bias=True)
+        (hidden2): Linear(in_features=128, out_features=256, bias=True)
+        (hidden3): Linear(in_features=256, out_features=64, bias=True)
+        (predict): Linear(in_features=64, out_features=10, bias=True)
+    )
+    """
     def __init__(self, n_feature, n_hidden1, n_hidden2, n_hidden3, n_output):
         super().__init__()
         self.hidden1 = nn.Linear(n_feature, n_hidden1)
@@ -30,14 +68,39 @@ class Net(nn.Module):
         self.predict = nn.Linear(n_hidden3, n_output)
         
     def forward(self, x):
+        """Forward propagation.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            The input tensor.
+        
+        Returns
+        -------
+        x : torch.Tensor
+            The output tensor.
+        """
         x = F.relu(self.hidden1(x))
         x = F.relu(self.hidden2(x))
         x = F.relu(self.hidden3(x))
         x = self.predict(x)
         return x
 
-
 def cluster_acc(y_true, y_pred):
+    """Calculate clustering accuracy. Require scikit-learn installed.
+
+    Parameters
+    ----------
+    y_true : list
+        True labels.
+    y_pred : list
+        Predicted labels.
+    
+    Returns
+    -------
+    accuracy : float
+        clustering accuracy
+    """
     y_true = y_true.astype(np.int64)
     assert y_pred.size == y_true.size
     D = max(y_pred.max(), y_true.max()) + 1
@@ -49,7 +112,65 @@ def cluster_acc(y_true, y_pred):
 
 
 class PSC:
+    """Parametric Spectral Clustering.
 
+    Parameters
+    ----------
+    n_neighbor : int, default=8
+        Number of neighbors to use when constructing the adjacency matrix using k-nearest neighbors.
+    sigma : float, default=1
+        The sigma value for the Gaussian kernel.
+    k : int, default=10
+        Number of clusters.
+    model : torch.nn.Module, default=Net(64, 128, 256, 64, 10)
+        The model used to learn the embedding.
+    criterion : torch.nn.modules.loss, default=nn.MSELoss()
+        The loss function used to train the model.
+    epochs : int, default=50
+        Number of epochs to train the model.
+    clustering : str, default="kmeans"
+        The clustering method used to cluster the embedding.
+    name : str, default=None
+        The name of the model file to save.
+    
+    Attributes
+    ----------
+    n_neighbor : int
+        Number of neighbors to use when constructing the adjacency matrix using k-nearest neighbors.
+    sigma : float
+        The sigma value for the Gaussian kernel.
+    k : int
+        Number of clusters.
+    model : torch.nn.Module
+        The model used to learn the embedding.
+    criterion : torch.nn.modules.loss
+        The loss function used to train the model.
+    optimizer : torch.optim
+        The optimizer used to train the model.
+    epochs : int
+        Number of epochs to train the model.
+    clustering : str
+        The clustering method used to cluster the embedding.
+    name : str
+        The name of the model file to save.
+    dataloader : torch.utils.data.DataLoader
+        The dataloader used to train the model.
+    cluster : sklearn.cluster
+        The clustering model used to cluster the embedding.
+    
+    Examples
+    --------
+    >>> model = Net(64, 128, 256, 64, 10)
+    >>> PSC(model = model).fit_predict(X)
+    array([0, 1, 2, ..., 8, 9, 8], dtype=int32)
+    >>> PSC(model = model).fit(X)
+    KMeans(algorithm='elkan', copy_x=True, init='k-means++', max_iter=100,
+        n_clusters=10, n_init=1, n_jobs=None, precompute_distances='auto',
+        random_state=None, tol=0.0001, verbose=0)
+    >>> PSC(model = model).predict(X)
+    array([0, 1, 2, ..., 8, 9, 8], dtype=int32)
+    >>> PSC(model = model).set_model(model)
+    """
     def __init__(
         self, 
         n_neighbor = 8, 
@@ -92,9 +213,7 @@ class PSC:
         U=U/((np.sum(U**2,axis=1)**0.5)[:,None])
         return U
 
-
     def __train(self):
-    
         running_loss = 0.0
 
         for inputs, labels in self.dataloader:
@@ -114,6 +233,22 @@ class PSC:
         return False
 
     def fit(self, X, saving_path = None, use_existing_model = None):
+        """Fit the model according to the given training data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training data.
+        saving_path : str, default=None
+            The name of the model file to save.
+        use_existing_model : str, default=None
+            The name of the model file to load.
+        
+        Returns
+        -------
+        self : object
+            Returns self.        
+        """
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
         if saving_path is not None and use_existing_model is not None:
@@ -169,11 +304,38 @@ class PSC:
         """
 
     def fit_predict(self, X, saving_path = None):
+        """Fit the model according to the given training data and predict the closest cluster each sample in X belongs to.
+        
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training data.
+        saving_path : str, default=None
+            The name of the model file to save.
+        
+        Returns
+        -------
+        cluster_index : array-like of shape (n_samples,)
+            Index of the cluster each sample belongs to.
+        """
         return self.fit(X, saving_path).cluster.labels_
 
     # predict the closest cluster
     def predict(self, X, model = None):
-
+        """Predict the closest cluster each sample in X belongs to.
+        
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training data.
+        model : str, default=None
+            The name of the model file to load.
+        
+        Returns
+        -------
+        cluster_index : array-like of shape (n_samples,)
+            Index of the cluster each sample belongs to.
+        """
         if self.__check_file_exist(model) is False:
             ValueError(
                 f"model {model} does not exist"
@@ -193,6 +355,13 @@ class PSC:
             return self.cluster.predict(U)
 
     def set_model(self, self_defined_model):
+        """Set the model to a self-defined model.
+        
+        Parameters
+        ----------
+        self_defined_model : torch.nn.Module
+            The self-defined model.
+        """
         self.model = self_defined_model
 
 def main():
