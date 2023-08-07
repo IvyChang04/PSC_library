@@ -18,7 +18,8 @@ from sklearn.utils.fixes import threadpool_limits
 TODO:
 - add other clustering methods
 - function comments(documentation) 
-    almost done. need to check examples.
+    Done
+- add `fit` and `predict` examples in PSC() class
 """
 
 
@@ -52,7 +53,7 @@ class Net(nn.Module):
     Examples
     --------
     >>> model = Net(64, 128, 256, 64, 10)
-    >>> print(model)
+    >>> model
     Net(
         (hidden1): Linear(in_features=64, out_features=128, bias=True)
         (hidden2): Linear(in_features=128, out_features=256, bias=True)
