@@ -170,8 +170,14 @@ class PSC:
     Start training
     >>> cluster_index
     array([5, 2, 2, ..., 2, 8, 2], dtype=int32)
+    >>> clust = PSC(model = model).fit(X, saving_path = "Spectral_Clustering")
+    Start training
+    >>> clust = PSC(model = model).fit(X, use_existing_model = "Spectral_Clustering")
+    Using existing model
+    >>> clust.predict(X, model = "Spectral_Clustering")
+    array([5, 2, 2, ..., 2, 8, 2], dtype=int32)
 
-
+    
     >>> model = Net(64, 128, 256, 64, 10)
     >>> PSC(model = model).fit_predict(X)
     array([0, 1, 2, ..., 8, 9, 8], dtype=int32)
@@ -182,7 +188,6 @@ class PSC:
     >>> PSC(model = model).predict(X)
     array([0, 1, 2, ..., 8, 9, 8], dtype=int32)
     >>> PSC(model = model).set_model(model)
-
     """
     def __init__(
         self, 
@@ -275,7 +280,7 @@ class PSC:
                 raise ValueError(
                     f"File `{use_existing_model}` do not exist"
                 )
-
+            self.name = use_existing_model
             print("Using existing model")
             with open(self.name, 'rb') as f:
                 self.model = pickle.load(f)
@@ -351,6 +356,7 @@ class PSC:
                 "model cannot be None"
             )
 
+        self.name = model
         with open(self.name, 'rb') as f:
                 self.model = pickle.load(f)
 
