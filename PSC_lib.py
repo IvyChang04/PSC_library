@@ -18,7 +18,7 @@ from sklearn.utils.fixes import threadpool_limits
 TODO:
 - add other clustering methods
 - function comments(documentation) 
-    almost dont. need to check examples.
+    almost done. need to check examples.
 """
 
 
@@ -160,6 +160,17 @@ class PSC:
     
     Examples
     --------
+    >>> from PSC_lib import PSC, Net
+    >>> from sklearn.datasets import load_digits
+    >>> digits = load_digits()
+    >>> X = digits.data/16
+    >>> model = Net(64, 128, 256, 64, 10)
+    >>> cluster_index = PSC(model = model).fit_predict(X)
+    Start training
+    >>> cluster_index
+    array([5, 2, 2, ..., 2, 8, 2], dtype=int32)
+
+
     >>> model = Net(64, 128, 256, 64, 10)
     >>> PSC(model = model).fit_predict(X)
     array([0, 1, 2, ..., 8, 9, 8], dtype=int32)
@@ -170,6 +181,7 @@ class PSC:
     >>> PSC(model = model).predict(X)
     array([0, 1, 2, ..., 8, 9, 8], dtype=int32)
     >>> PSC(model = model).set_model(model)
+
     """
     def __init__(
         self, 
@@ -295,13 +307,6 @@ class PSC:
             self.cluster = cluster
 
         return self
-
-        """
-        digits = load_digits()
-        X = digits.data/16
-
-        cluster_index = PSC(clustering = "kmeans").fit(X)
-        """
 
     def fit_predict(self, X, saving_path = None):
         """Fit the model according to the given training data and predict the closest cluster each sample in X belongs to.
