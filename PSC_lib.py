@@ -138,27 +138,37 @@ class PSC:
     ----------
     n_neighbor : int
         Number of neighbors to use when constructing the adjacency matrix using k-nearest neighbors.
+
     sigma : float
         The sigma value for the Gaussian kernel.
+
     k : int
         Number of clusters.
+
     model : torch.nn.Module
         The model used to learn the embedding.
+
     criterion : torch.nn.modules.loss
         The loss function used to train the model.
+
     optimizer : torch.optim
         The optimizer used to train the model.
+
     epochs : int
         Number of epochs to train the model.
+
     clustering : str
         The clustering method used to cluster the embedding.
+
     name : str
         The name of the model file to save.
+
     dataloader : torch.utils.data.DataLoader
         The dataloader used to train the model.
+
     cluster : sklearn.cluster
         The clustering model used to cluster the embedding.
-    
+
     Examples
     --------
     >>> from PSC_lib import PSC, Net
@@ -171,17 +181,12 @@ class PSC:
     >>> cluster_index
     array([5, 2, 2, ..., 2, 8, 2], dtype=int32)
 
-
-    >>> model = Net(64, 128, 256, 64, 10)
-    >>> PSC(model = model).fit_predict(X)
-    array([0, 1, 2, ..., 8, 9, 8], dtype=int32)
-    >>> PSC(model = model).fit(X)
-    KMeans(algorithm='elkan', copy_x=True, init='k-means++', max_iter=100,
-        n_clusters=10, n_init=1, n_jobs=None, precompute_distances='auto',
-        random_state=None, tol=0.0001, verbose=0)
-    >>> PSC(model = model).predict(X)
-    array([0, 1, 2, ..., 8, 9, 8], dtype=int32)
-    >>> PSC(model = model).set_model(model)
+    >>> clust = PSC(model = model).fit(X, saving_path = "Spectral_Clustering")
+    Start training
+    >>> clust = PSC(model = model).fit(X, use_existing_model = "Spectral_Clustering")
+    Using existing model
+    >>> clust.predict(X, model = "Spectral_Clustering")
+    array([5, 2, 2, ..., 2, 8, 2], dtype=int32)
 
     """
     def __init__(
@@ -374,15 +379,20 @@ def main():
     # data
     digits = load_digits()
     X = digits.data/16
+    y = digits.target
+    # print(y)
 
-    # saving_path = "Spectraal_Clustering"
-    # cluster_index = PSC().fit_predict(X)
+    saving_path = "Spectraal_Clustering"
+    cluster_index = PSC().fit_predict(X)
+    # print(cluster_index)
 
-    clust = PSC().fit(X, saving_path='test')
-    print(type(clust))
-    clust.predict(X, model = 'test')
+    print(cluster_acc(y, cluster_index))
 
-    print(clust.cluster.cluster_centers_)
+    # clust = PSC().fit(X, saving_path='test')
+    # clust.predict(X, model = 'test')
+    # print(clust.cluster.cluster_centers_)
+
+
 
 if __name__ == "__main__":
     main()
