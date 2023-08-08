@@ -4,7 +4,8 @@ from scipy.spatial.distance import cdist
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, AgglomerativeClustering
+from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import train_test_split
 from sklearn.cluster import DBSCAN
 from sklearn.datasets import load_digits
@@ -17,6 +18,8 @@ from sklearn.utils.fixes import threadpool_limits
 """
 TODO:
 - add other clustering methods
+    AgglomerativeClustering
+    GaussianMixture
 - function comments(documentation) 
     Done
 - add `fit` and `predict` examples in PSC() class
@@ -311,8 +314,14 @@ class PSC:
         if isinstance(self.clustering, str) and self.clustering == "kmeans":
             kmeans = KMeans(n_clusters=self.k, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
             cluster = kmeans.fit(U)
-            self.cluster = cluster
-
+        elif isinstance(self.clustering, str) and self.clustering == "gaussian_mixture":
+            gmm = GaussianMixture(n_components=self.k)
+            cluster = gmm.fit(U)
+        elif isinstance(self.clustering, str) and self.clustering == "agglomerative":
+            agglomerative = AgglomerativeClustering(n_clusters=self.k, linkage='ward')
+            cluster = agglomerative.fit(U)
+        self.cluster = cluster
+        
         return self
 
     def fit_predict(self, X, saving_path = None):
@@ -330,7 +339,12 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        return self.fit(X, saving_path).cluster.labels_
+        if isinstance(self.clustering, str) and self.clustering == "kmeans":
+            return self.fit(X, saving_path).cluster.labels_
+        elif isinstance(self.clustering, str) and self.clustering == "gaussian_mixture":
+            return self.fit(X, saving_path).cluster.means_
+        elif isinstance(self.clustering, str) and self.clustering == "agglomerative":
+            return self.fit(X, saving_path).cluster.labels_
 
     # predict the closest cluster
     def predict(self, X, model = None):
@@ -366,6 +380,10 @@ class PSC:
 
         if isinstance(self.clustering, str) and self.clustering == "kmeans":
             return self.cluster.predict(U)
+        elif isinstance(self.clustering, str) and self.clustering == "gaussian_mixture":
+            return self.cluster.predict(U)
+        elif isinstance(self.clustering, str) and self.clustering == "agglomerative":
+            return self.cluster.fit_predict(U)
 
     def set_model(self, self_defined_model):
         """Set the model to a self-defined model.
@@ -382,14 +400,29 @@ def main():
     digits = load_digits()
     X = digits.data/16
 
-    # saving_path = "Spectraal_Clustering"
+    # saving_path = "Spectral_Clustering"
     # cluster_index = PSC().fit_predict(X)
 
-    clust = PSC().fit(X, saving_path='test')
+    # kmeans
+    print("kmeans")
+    clust = PSC().fit(X, use_existing_model='kmeans')
     print(type(clust))
-    clust.predict(X, model = 'test')
+    clust.predict(X, model = 'kmeans')
+    print(clust.cluster.cluster_centers_) # Coordinates of cluster centers.
+    
+    # gaussian_mixture
+    print("gaussian")
+    clust = PSC(clustering='gaussian_mixture').fit(X, use_existing_model='gaussian_mixture')
+    print(type(clust))
+    clust.predict(X, model = 'gaussian_mixture')
+    print(clust.cluster.means_) # The mean of each mixture component.
 
-    print(clust.cluster.cluster_centers_)
+    # agglomerative
+    print("agglomerative")
+    clust = PSC(clustering='agglomerative').fit(X, use_existing_model='agglomerative')
+    print(type(clust))
+    clust.predict(X, model = 'agglomerative')
+    print(clust.cluster.labels_) # Cluster labels for each point.
 
 if __name__ == "__main__":
     main()
