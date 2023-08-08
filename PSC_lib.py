@@ -20,6 +20,7 @@ TODO:
 - function comments(documentation) 
     Done
 - add `fit` and `predict` examples in PSC() class
+    Done
 """
 
 
@@ -186,7 +187,7 @@ class PSC:
     >>> clust = PSC(model = model).fit(X, use_existing_model = "Spectral_Clustering")
     Using existing model
     >>> clust.predict(X, model = "Spectral_Clustering")
-    array([5, 2, 2, ..., 2, 8, 2], dtype=int32)
+    array([3, 9, 9, ..., 9, 8, 9], dtype=int32)
 
     """
     def __init__(
@@ -280,7 +281,7 @@ class PSC:
                 raise ValueError(
                     f"File `{use_existing_model}` do not exist"
                 )
-
+            self.name = use_existing_model
             print("Using existing model")
             with open(self.name, 'rb') as f:
                 self.model = pickle.load(f)
@@ -356,6 +357,7 @@ class PSC:
                 "model cannot be None"
             )
 
+        self.name = model
         with open(self.name, 'rb') as f:
                 self.model = pickle.load(f)
 
