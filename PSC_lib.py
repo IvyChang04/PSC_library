@@ -4,10 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.cluster import KMeans
-from sklearn.model_selection import train_test_split
-from sklearn.cluster import DBSCAN
 from sklearn.datasets import load_digits
-from sklearn.decomposition import PCA
 from scipy.optimize import linear_sum_assignment
 import pickle
 import os
@@ -256,6 +253,18 @@ class PSC:
                 return True
         return False
 
+    def __check_clustering_method(self) -> None:
+        if self.clustering is None:
+            raise ValueError(
+                "No clustering method assigned."
+            )
+
+    def __check_model(self) -> None:
+        if self.model is None:
+            raise ValueError(
+                "No model assigned."
+            )
+
     def fit(self, X):
         """Fit the model according to the given training data.
 
@@ -273,6 +282,9 @@ class PSC:
         self : object
             Returns self.        
         """
+        self.__check_clustering_method()
+        self.__check_model()
+
         x = torch.from_numpy(X).type(torch.FloatTensor)
         self.__train_model(X, x)
         U = self.model(x).detach().numpy()
@@ -301,6 +313,8 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
+        self.__check_clustering_method()
+        self.__check_model()
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
         self.__train_model(X, x)
