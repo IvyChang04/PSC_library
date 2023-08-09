@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
 import torch
 import torch.nn as nn
@@ -15,11 +14,7 @@ import os
 
 """
 TODO:
-- add other clustering methods
-- function comments(documentation) 
-    Done
-- add `fit` and `predict` examples in PSC() class
-    Done
+- Update function comments and Example
 """
 
 class Net(nn.Module):
@@ -283,7 +278,7 @@ class PSC:
         U = self.model(x).detach().numpy()
         
         if hasattr(self.clustering, "fit") is False:
-            AttributeError(
+            raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'fit'"
             )
 
@@ -312,7 +307,7 @@ class PSC:
         U = self.model(x).detach().numpy()
 
         if hasattr(self.clustering, "fit_predict") is False:
-            AttributeError(
+            raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'fit_predict'"
             )
 
@@ -335,15 +330,16 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
+        
         if self.model_fitted is False:
-            ValueError(
-                "Model has not been fitted yet."
+            raise ValueError(
+                "This instance is not fitted yet."
             )
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
         U = self.model(x).detach().numpy()
         if hasattr(self.clustering, "predict") is False:
-            AttributeError(
+            raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'predict'"
             )
 
@@ -368,7 +364,7 @@ class PSC:
 
     def load_model(self, path: str) -> None:
         if self.__check_file_exist(path) is False:
-            FileNotFoundError(
+            raise FileNotFoundError(
                 f"No such file or directory: '{path}'"
             )
         
