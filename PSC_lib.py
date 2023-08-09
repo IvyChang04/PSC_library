@@ -349,7 +349,6 @@ class PSC:
 
         return self.clustering.predict(U)
         
-
     def set_model(self, self_defined_model) -> None:
         """Set the model to a self-defined model.
         
