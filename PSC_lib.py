@@ -127,13 +127,13 @@ class PSC:
         The sigma value for the Gaussian kernel.
     k : int, default=10
         Number of clusters.
-    model : torch.nn.Module, default=Net(64, 128, 256, 64, 10)
+    model : torch.nn.Module
         The model used to learn the embedding.
     criterion : torch.nn.modules.loss, default=nn.MSELoss()
         The loss function used to train the model.
     epochs : int, default=50
         Number of epochs to train the model.
-    clustering : str, default="kmeans"
+    clustering : str, default=None
         The clustering method used to cluster the embedding.
     name : str, default=None
         The name of the model file to save.
@@ -168,7 +168,7 @@ class PSC:
         Whether the model has been fitted.
 
     dataloader : torch.utils.data.DataLoader
-        The dataloader used to train the model.`
+        The dataloader used to train the model.
 
     Examples
     --------
