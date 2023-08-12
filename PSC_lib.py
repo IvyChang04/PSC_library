@@ -92,6 +92,18 @@ def cluster_acc(y_true, y_pred):
     -------
     accuracy : float
         clustering accuracy
+
+    Examples
+    --------
+    >>> from PSC_lib import cluster_acc
+    >>> from sklearn.datasets import load_digits
+    >>> from sklearn.cluster import KMeans
+    >>> digits = load_digits()
+    >>> X = digits.data/16
+    >>> y = digits.target
+    >>> y_pred = KMeans(n_clusters=10, random_state=0).fit_predict(X)
+    >>> cluster_acc(y, y_pred)
+    0.7935447968836951
     """
     y_true = y_true.astype(np.int64)
     assert y_pred.size == y_true.size
@@ -114,13 +126,13 @@ class PSC:
         The sigma value for the Gaussian kernel.
     k : int, default=10
         Number of clusters.
-    model : torch.nn.Module, default=Net(64, 128, 256, 64, 10)
+    model : torch.nn.Module
         The model used to learn the embedding.
     criterion : torch.nn.modules.loss, default=nn.MSELoss()
         The loss function used to train the model.
     epochs : int, default=50
         Number of epochs to train the model.
-    clustering : str, default="kmeans"
+    clustering : str, default=None
         The clustering method used to cluster the embedding.
     name : str, default=None
         The name of the model file to save.
@@ -151,33 +163,37 @@ class PSC:
     clustering : str
         The clustering method used to cluster the embedding.
 
-    name : str
-        The name of the model file to save.
+    model_fitted : bool
+        Whether the model has been fitted.
 
     dataloader : torch.utils.data.DataLoader
         The dataloader used to train the model.
-
-    cluster : sklearn.cluster
-        The clustering model used to cluster the embedding.
 
     Examples
     --------
     >>> from PSC_lib import PSC, Net
     >>> from sklearn.datasets import load_digits
+    >>> from sklearn.cluster import KMeans
     >>> digits = load_digits()
     >>> X = digits.data/16
+    >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
     >>> model = Net(64, 128, 256, 64, 10)
-    >>> cluster_index = PSC(model = model).fit_predict(X)
+    >>> psc = PSC(model=model, clustering_method=cluster_method)
+    >>> psc.fit(X)
     Start training
-    >>> cluster_index
-    array([5, 2, 2, ..., 2, 8, 2], dtype=int32)
+    >>> psc.save_model("model")
+    >>> cluster_idx = psc.predict(X)
 
-    >>> clust = PSC(model = model).fit(X, saving_path = "Spectral_Clustering")
-    Start training
-    >>> clust = PSC(model = model).fit(X, model_path = "Spectral_Clustering")
-    Using existing model
-    >>> clust.predict(X, model = "Spectral_Clustering")
-    array([3, 9, 9, ..., 9, 8, 9], dtype=int32)
+    >>> from PSC_lib import PSC, Net
+    >>> from sklearn.datasets import load_digits
+    >>> from sklearn.cluster import KMeans
+    >>> digits = load_digits()
+    >>> X = digits.data/16
+    >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
+    >>> model = Net(64, 128, 256, 64, 10)
+    >>> psc = PSC(model=model, clustering_method=cluster_method)
+    >>> psc.load_model("model")
+    >>> cluster_idx = psc.predict(X)
 
     """
     def __init__(
@@ -196,7 +212,9 @@ class PSC:
         self.k = k
         self.model = model
         self.criterion = criterion
+
         self.optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
+
         self.epochs = epochs
         self.clustering = clustering_method
         self.model_fitted = False
@@ -272,15 +290,11 @@ class PSC:
         ----------
         X : array-like of shape (n_samples, n_features)
             Training data.
-        saving_path : str, default=None
-            The name of the model file to save.
-        model_path : str, default=None
-            The name of the model file to load.
-        
+
         Returns
         -------
         self : object
-            Returns self.        
+            Returns the instance itself.        
         """
         self.__check_clustering_method()
         self.__check_model()
@@ -300,13 +314,11 @@ class PSC:
 
     def fit_predict(self, X):
         """Fit the model according to the given training data and predict the closest cluster each sample in X belongs to.
-        
+
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
             Training data.
-        saving_path : str, default=None
-            The name of the model file to save.
         
         Returns
         -------
@@ -331,24 +343,17 @@ class PSC:
     # predict the closest cluster
     def predict(self, X):
         """Predict the closest cluster each sample in X belongs to.
-        
+
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Training data.
-        model : str, default=None
-            The name of the model file to load.
+            New data.
         
         Returns
         -------
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        
-        if self.model_fitted is False:
-            raise ValueError(
-                "This instance is not fitted yet."
-            )
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
         U = self.model(x).detach().numpy()
@@ -356,6 +361,9 @@ class PSC:
             raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'predict'"
             )
+
+        if self.model_fitted is False:
+            return self.clustering.fit_predict(U)
 
         return self.clustering.predict(U)
         
@@ -371,12 +379,26 @@ class PSC:
         self.model = self_defined_model
 
     def save_model(self, path: str) -> None:
+        """Save the model to a file.
+
+        Parameters
+        ----------
+        path : str
+            The path of the file.
+        """
         torch.save(self.model.state_dict(), path)
 
         with open(path, 'wb') as f:
             pickle.dump(self.model, f)
 
     def load_model(self, path: str) -> None:
+        """Load the model from a file.
+
+        Parameters
+        ----------
+        path : str
+            The path of the file.
+        """
         if self.__check_file_exist(path) is False:
             raise FileNotFoundError(
                 f"No such file or directory: '{path}'"
@@ -384,7 +406,6 @@ class PSC:
         
         with open(path, 'rb') as f:
                 self.model = pickle.load(f)
-        self.model_fitted = True
 
 def main():
     # data
@@ -394,18 +415,20 @@ def main():
     clust_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
     model = Net(64, 128, 256, 64, 10)
     # test fit_predict()
-    # psc = PSC(model=model, clustering_method=cluster_method)
+    # psc = PSC(model=model, clustering_method=clust_method)
     # cluster_id = psc.fit_predict(X)
 
     # test fit and predict
     psc = PSC(model=model, clustering_method=clust_method)
     psc.fit(X)
-    # psc.save_model("test")
-    cluster_id = psc.predict(X)
+    psc.save_model("test")
+    # cluster_id = psc.predict(X)
 
-    # test_clust = PSC(model=model, clustering_method=cluster_method)
-    # test_clust.load_model("test")
-    # cluster_id = test_clust.predict(X)
+    cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
+    # model2 = Net(64, 128, 256, 64, 10)
+    test_clust = PSC(model=model, clustering_method=cluster_method)
+    test_clust.load_model("test")
+    cluster_id = test_clust.predict(X)
 
     print(cluster_acc(y, cluster_id))
 
