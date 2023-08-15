@@ -414,19 +414,20 @@ def main():
     y = digits.target
     clust_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
     model = Net(64, 128, 256, 64, 10)
+
     # test fit_predict()
-    # psc = PSC(model=model, clustering_method=clust_method)
-    # cluster_id = psc.fit_predict(X)
+    psc = PSC(model=model, clustering_method=clust_method)
+    cluster_id = psc.fit_predict(X)
 
     # test fit and predict
     psc = PSC(model=model, clustering_method=clust_method)
     psc.fit(X)
     psc.save_model("test")
-    # cluster_id = psc.predict(X)
+    cluster_id = psc.predict(X)
 
     cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    # model2 = Net(64, 128, 256, 64, 10)
-    test_clust = PSC(model=model, clustering_method=cluster_method)
+    model2 = Net(64, 128, 256, 64, 10)
+    test_clust = PSC(model=model2, clustering_method=cluster_method)
     test_clust.load_model("test")
     cluster_id = test_clust.predict(X)
 
