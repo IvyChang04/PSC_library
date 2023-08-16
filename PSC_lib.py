@@ -6,6 +6,9 @@ import torch.nn.functional as F
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_digits
 from scipy.optimize import linear_sum_assignment
+from sklearn.model_selection import train_test_split
+import random
+import time
 import pickle
 import os
 
@@ -205,6 +208,7 @@ class PSC:
         criterion = nn.MSELoss(),
         epochs = 50,
         clustering_method = None,
+        test_spliting_rate = 0.3
         ) -> None:
 
         self.n_neighbor = n_neighbor
@@ -212,7 +216,7 @@ class PSC:
         self.k = k
         self.model = model
         self.criterion = criterion
-
+        self.test_spliting_rate = test_spliting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
 
         self.epochs = epochs
@@ -300,7 +304,16 @@ class PSC:
         self.__check_model()
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
-        self.__train_model(X, x)
+
+        if self.test_spliting_rate == 0:
+            X_train, x_train = X, x
+        
+        else:
+            X_train, _, x_train, _ = train_test_split(
+                X, x, test_size=self.test_spliting_rate, random_state=random.randint(1, 100))
+
+        self.__train_model(X_train, x_train)
+
         U = self.model(x).detach().numpy()
         
         if hasattr(self.clustering, "fit") is False:
@@ -329,7 +342,15 @@ class PSC:
         self.__check_model()
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
-        self.__train_model(X, x)
+
+        if self.test_spliting_rate == 0:
+            X_train, x_train = X, x
+        
+        else:
+            X_train, _, x_train, _ = train_test_split(
+                X, x, test_size=self.test_spliting_rate, random_state=random.randint(1, 100))
+
+        self.__train_model(X_train, x_train)
         U = self.model(x).detach().numpy()
 
         if hasattr(self.clustering, "fit_predict") is False:
@@ -416,20 +437,24 @@ def main():
     model = Net(64, 128, 256, 64, 10)
 
     # test fit_predict()
-    psc = PSC(model=model, clustering_method=clust_method)
+    psc = PSC(model=model, clustering_method=clust_method, test_spliting_rate=0)
+
+    time1 = round(time.time()*1000)
     cluster_id = psc.fit_predict(X)
+    time2 = round(time.time()*1000)
+    print(f"time spent: {time2 - time1} milliseconds")
 
     # test fit and predict
-    psc = PSC(model=model, clustering_method=clust_method)
-    psc.fit(X)
-    psc.save_model("test")
-    cluster_id = psc.predict(X)
+    # psc = PSC(model=model, clustering_method=clust_method)
+    # psc.fit(X)
+    # psc.save_model("test")
+    # cluster_id = psc.predict(X)
 
-    cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    model2 = Net(64, 128, 256, 64, 10)
-    test_clust = PSC(model=model2, clustering_method=cluster_method)
-    test_clust.load_model("test")
-    cluster_id = test_clust.predict(X)
+    # cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
+    # model2 = Net(64, 128, 256, 64, 10)
+    # test_clust = PSC(model=model2, clustering_method=cluster_method)
+    # test_clust.load_model("test")
+    # cluster_id = test_clust.predict(X)
 
     print(cluster_acc(y, cluster_id))
 
