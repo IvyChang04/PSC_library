@@ -14,7 +14,18 @@ import os
 
 """
 TODO:
-- Update function comments and Example
+- Update test_spliting_rate comment
+
+
+Notes:
+- Can't really `catch` segmentation fault in Python since Python's exception handling machanisms are designed
+  to catch and handle exceptions raised by Python code itself, not low-system error (like segfault).
+
+- Fault handler need to use extra command to trace back (python -X faulthandler filename.py), so we can't
+  custom error message.
+
+- Using neither Python signal nor subprocess isn't a reliable way to catch segmentation fault. Besides, both
+  methods need to be added by user, which means we can't add this directly into our library code.
 """
 
 class Net(nn.Module):
