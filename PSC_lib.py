@@ -21,7 +21,7 @@ Notes:
 - Can't really `catch` segmentation fault in Python since Python's exception handling machanisms are designed
   to catch and handle exceptions raised by Python code itself, not low-system error (like segfault).
 
-- Fault handler need to use extra command to trace back (python -X faulthandler filename.py), so we can't
+- Fault handler needs to use extra command to trace back (python -X faulthandler filename.py), so we can't
   custom error message.
 
 - Using neither Python signal nor subprocess isn't a reliable way to catch segmentation fault. Besides, both
