@@ -24,7 +24,7 @@ Notes:
 - Fault handler needs to use extra command to trace back (python -X faulthandler filename.py), so we can't
   custom error message.
 
-- Using neither Python signal nor subprocess isn't a reliable way to catch segmentation fault. Besides, both
+- Using neither Python signal nor subprocess is a reliable way to catch segmentation fault. Besides, both
   methods need to be added by user, which means we can't add this directly into our library code.
 """
 
