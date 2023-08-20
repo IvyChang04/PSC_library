@@ -4,7 +4,6 @@ import torch.optim as optim
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
-import torch.utils.data as Data
 import numpy as np
 from scipy.spatial.distance import cdist
 from sklearn.cluster import KMeans
@@ -51,15 +50,15 @@ class Autoencoder(nn.Module):
         return x
 
 model = Autoencoder()
-device = torch.device("mps")
-model = model.to(device)
+# device = torch.device("mps")
+# model = model.to(device)
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 for epoch in range(100):
     running_loss = 0.0
     for x,y in train_loader:
-        x = x.to(device)
+        # x = x.to(device)
         x = x.view(-1, 28 * 28)
         optimizer.zero_grad()
         output = model(x)
