@@ -136,6 +136,15 @@ def AMI(y_true, y_pred):
     return adjusted_mutual_info_score(y_true, y_pred)
 
 def acc_report(y_true, y_pred):
+    """Report the accuracy of clustering.
+
+    Parameters
+    ----------
+    y_true : list
+        True labels.
+    y_pred : list
+        Predicted labels.
+    """
     clusterAcc = cluster_acc(y_true=y_true, y_pred=y_pred)
     ari = ARI(y_true=y_true, y_pred=y_pred)
     ami = AMI(y_true=y_true, y_pred=y_pred)
@@ -161,40 +170,33 @@ class PSC:
         The loss function used to train the model.
     epochs : int, default=50
         Number of epochs to train the model.
-    clustering : str, default=None
+    clustering_method : sklearn.cluster, default=None
         The clustering method used to cluster the embedding.
-    name : str, default=None
-        The name of the model file to save.
+    spliting_rate : float, default=0.3
+        The spliting rate of the training data.
     
     Attributes
     ----------
     n_neighbor : int
         Number of neighbors to use when constructing the adjacency matrix using k-nearest neighbors.
-
     sigma : float
         The sigma value for the Gaussian kernel.
-
     k : int
         Number of clusters.
-
     model : torch.nn.Module
         The model used to learn the embedding.
-
     criterion : torch.nn.modules.loss
         The loss function used to train the model.
-
+    test_spliting_rate : float
+        The spliting rate of the training data.
     optimizer : torch.optim
         The optimizer used to train the model.
-
     epochs : int
         Number of epochs to train the model.
-
     clustering : str
         The clustering method used to cluster the embedding.
-
     model_fitted : bool
         Whether the model has been fitted.
-
     dataloader : torch.utils.data.DataLoader
         The dataloader used to train the model.
 
@@ -223,7 +225,6 @@ class PSC:
     >>> psc = PSC(model=model, clustering_method=cluster_method)
     >>> psc.load_model("model")
     >>> cluster_idx = psc.predict(X)
-
     """
     def __init__(
         self, 
