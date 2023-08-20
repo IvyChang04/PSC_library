@@ -50,15 +50,15 @@ class Autoencoder(nn.Module):
         return x
 
 model = Autoencoder()
-device = torch.device("mps")
-model = model.to(device)
+# device = torch.device("mps")
+# model = model.to(device)
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 for epoch in range(100):
     running_loss = 0.0
     for x,y in train_loader:
-        x = x.to(device)
+        # x = x.to(device)
         optimizer.zero_grad()
         output = model(x)
         loss = criterion(output, x)
