@@ -7,6 +7,7 @@ from sklearn.cluster import KMeans
 from sklearn.datasets import load_digits
 from scipy.optimize import linear_sum_assignment
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score
 import random
 import time
 import pickle
@@ -128,6 +129,20 @@ def cluster_acc(y_true, y_pred):
     row_ind, col_ind = linear_sum_assignment(w.max() - w)
     return w[row_ind, col_ind].sum() * 1.0 / y_pred.size
 
+def ARI(y_true, y_pred):
+    return adjusted_rand_score(y_true, y_pred)
+
+def AMI(y_true, y_pred):
+    return adjusted_mutual_info_score(y_true, y_pred)
+
+def acc_report(y_true, y_pred):
+    clusterAcc = cluster_acc(y_true=y_true, y_pred=y_pred)
+    ari = ARI(y_true=y_true, y_pred=y_pred)
+    ami = AMI(y_true=y_true, y_pred=y_pred)
+
+    print(f"Clustering Accuracy: {clusterAcc}")
+    print(f"adjusted rand index: {ari}")
+    print(f"adjusted mutual information: {ami}")
 
 class PSC:
     """Parametric Spectral Clustering.
