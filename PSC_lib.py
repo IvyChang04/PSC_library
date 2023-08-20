@@ -141,8 +141,8 @@ def acc_report(y_true, y_pred):
     ami = AMI(y_true=y_true, y_pred=y_pred)
 
     print(f"Clustering Accuracy: {clusterAcc}")
-    print(f"adjusted rand index: {ari}")
-    print(f"adjusted mutual information: {ami}")
+    print(f"Adjusted rand index: {ari}")
+    print(f"Adjusted mutual information: {ami}")
 
 class PSC:
     """Parametric Spectral Clustering.
@@ -469,6 +469,7 @@ def main():
     cluster_id = psc.fit_predict(X)
     time2 = round(time.time()*1000)
     print(f"time spent: {time2 - time1} milliseconds")
+    acc_report(y, cluster_id)
 
     # test fit and predict
     # psc = PSC(model=model, clustering_method=clust_method)
