@@ -1,11 +1,11 @@
 import numpy as np
 from scipy.spatial.distance import cdist
+from scipy.optimize import linear_sum_assignment
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_digits
-from scipy.optimize import linear_sum_assignment
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score
 import random

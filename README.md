@@ -4,7 +4,7 @@
 TODO
 
 <!-- PREREQUISITES -->
-## Prerequisites
+<!-- ## Prerequisites
 
 Things you need to install before started.
 * torch
@@ -26,7 +26,7 @@ Things you need to install before started.
 * pickle
     ```sh
     pip3 install pickle5
-    ```
+    ``` -->
 
 <!-- SAMPLE USAGE -->
 ## Sample Usage
