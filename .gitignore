@@ -3,3 +3,6 @@ build/
 ParametricSpectralClustering/__pycache__/
 *.egg-info
 .DS_store
+CHANGELOG.txt
+PSC_lib.py
+test.py
