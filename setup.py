@@ -12,13 +12,12 @@ requirements = [
     'numpy >= 1.19.2',
     'scikit-learn >= 1.1.2',
     'scipy >= 1.7.3',
-    'pickle >= 4.0'
 ]
 
 
 setup (
     name='ParametricSpectralClustering',
-    version='0.0.10',
+    version='0.0.13',
     description='A library for users to use parametric spectral clustering',
     long_description=open("README.md").read() + '\n\n' + open("CHANGELOG.txt").read(),
     long_description_content_type = "text/markdown",
