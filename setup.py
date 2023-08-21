@@ -32,6 +32,5 @@ setup (
     install_requires=requirements,
     include_package_data=True,
     zip_safe=False,
-    scripts=['bin/PSC_library.py'],
     python_requires = ">=3.8",
 )
