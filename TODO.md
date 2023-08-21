@@ -1,0 +1,5 @@
+- [ ] Make sure the information in setup.py is correct
+  - [ ] author name
+  - [ ] author email
+  - [ ] requirements
+- [ ] Update README
