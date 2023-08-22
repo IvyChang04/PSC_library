@@ -1,32 +1,32 @@
 <!-- Parametric Spectral Clustering -->
-## Parametric Spectral Clustering
+# Parametric Spectral Clustering
 
 This repository provides a PyTorch implementation of the **Parametric Spectral Clustering** (PSC) algorithm. PSC is a novel spectral clustering algorithm that overcomes the limitations of the traditional spectral clustering algorithm at computational limitations, memory requirements, and inability to perform online learning. PSC is a general framework that can be applied to any spectral clustering algorithm. In this repository, we provide an example of PSC with the K-means clustering algorithm.
 
 <!-- PREREQUISITES -->
-<!-- ## Prerequisites
+# Installation
+## Dependencies
+Parametric Spectral Clustering requires:
 
-Things you need to install before started.
-* torch
-    ```sh
-    pip3 install torch torchvision torchaudio
-    ```
-* numpy
-    ```sh
-    pip install numpy
-    ```
-* sklearn
-    ```sh
-    pip3 install -U scikit-learn
-    ```
-* scipy
-    ```sh
-    python -m pip install scipy
-    ```
-* pickle
-    ```sh
-    pip3 install pickle5
-    ``` -->
+* Python (>= 3.8)
+* PyTorch (>= 1.19.2)
+* Scikit-learn (>= 1.1.2)
+* SciPy (>= 1.7.3)
+
+---
+
+<!-- INSTALLATION -->
+## User installation
+
+Use setup.py:
+```sh
+python setup.py install
+```
+
+Use pip:
+```sh
+pip install -i https://test.pypi.org/simple/ ParametricSpectralClustering==0.0.14
+```
 
 <!-- SAMPLE USAGE -->
 ## Sample Usage
@@ -34,7 +34,7 @@ Things you need to install before started.
 Using UCI ML hand-written digits datasets as an example.
 
 ```sh
->>> from PSC_lib import PSC, Net
+>>> from ParametricSpectralClustering import PSC, Net
 >>> from sklearn.datasets import load_digits
 >>> from sklearn.cluster import KMeans
 >>> digits = load_digits()
@@ -45,13 +45,8 @@ Using UCI ML hand-written digits datasets as an example.
 >>> cluster_idx = psc.fit_predict(X)
 ```
 
-<!-- INSTALLATION -->
-## Installation
-```sh
-python setup.py install
-```
 <!-- COMMEND LINE TOOL -->
-## Commend line tool
+## Command line tool
 
 TODO
 
@@ -66,4 +61,4 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 |---|---|---|
 |E-mail|ivy900403@gmail.com|luludai020127@gmail.com|
 
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+Project Link: [TBA](https://github.com/your_username/repo_name)

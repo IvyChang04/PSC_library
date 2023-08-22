@@ -7,6 +7,13 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Artificial Intelligence',
 ]
 
+requirements = [
+    'torch >= 1.12.1',
+    'numpy >= 1.19.2',
+    'scikit-learn >= 1.1.2',
+    'scipy >= 1.7.3'
+]
+
 setup (
     name='ParametricSpectralClustering',
     version='0.0.14',
@@ -19,12 +26,7 @@ setup (
     author='Ivy Chang, Hsin Ju Tai',
     author_email='ivy900403@gmail.com, luludai020127@gmail.com',
     license='MIT',
-    install_requires=[
-        'torch >= 1.12.1',
-        'numpy >= 1.19.2',
-        'scikit-learn >= 1.1.2',
-        'scipy >= 1.7.3'
-    ],
+    install_requires=requirements,
     include_package_data=True,
     zip_safe=False,
     python_requires = ">=3.8",
