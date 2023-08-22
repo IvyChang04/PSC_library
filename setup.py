@@ -13,7 +13,7 @@ setup (
     description='A library for users to use parametric spectral clustering',
     long_description=open("README.md").read() + '\n\n' + open("CHANGELOG.txt").read(),
     long_description_content_type = "text/markdown",
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests*"]),
     classifiers=classifiers,
     url='',
     author='Ivy Chang, Hsin Ju Tai',
@@ -28,5 +28,4 @@ setup (
     include_package_data=True,
     zip_safe=False,
     python_requires = ">=3.8",
-    packages=find_packages(exclude=["tests*"])
 )
