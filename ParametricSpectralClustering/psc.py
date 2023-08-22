@@ -4,30 +4,11 @@ from scipy.optimize import linear_sum_assignment
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from sklearn.cluster import KMeans
-from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score
 import random
-import time
 import pickle
 import os
-
-"""
-TODO:
-- Update test_spliting_rate comment
-
-
-Notes:
-- Can't really `catch` segmentation fault in Python since Python's exception handling machanisms are designed
-  to catch and handle exceptions raised by Python code itself, not low-system error (like segfault).
-
-- Fault handler needs to use extra command to trace back (python -X faulthandler filename.py), so we can't
-  custom error message.
-
-- Using neither Python signal nor subprocess is a reliable way to catch segmentation fault. Besides, both
-  methods need to be added by user, which means we can't add this directly into our library code.
-"""
 
 class Net(nn.Module):
     """The model used to learn the embedding.
@@ -454,38 +435,3 @@ class PSC:
         
         with open(path, 'rb') as f:
                 self.model = pickle.load(f)
-
-def main():
-    # data
-    digits = load_digits()
-    X = digits.data/16
-    y = digits.target
-    clust_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    model = Net(64, 128, 256, 64, 10)
-
-    # test fit_predict()
-    psc = PSC(model=model, clustering_method=clust_method, test_spliting_rate=0)
-
-    time1 = round(time.time()*1000)
-    cluster_id = psc.fit_predict(X)
-    time2 = round(time.time()*1000)
-    print(f"time spent: {time2 - time1} milliseconds")
-    acc_report(y, cluster_id)
-
-    # test fit and predict
-    # psc = PSC(model=model, clustering_method=clust_method)
-    # psc.fit(X)
-    # psc.save_model("test")
-    # cluster_id = psc.predict(X)
-
-    # cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    # model2 = Net(64, 128, 256, 64, 10)
-    # test_clust = PSC(model=model2, clustering_method=cluster_method)
-    # test_clust.load_model("test")
-    # cluster_id = test_clust.predict(X)
-
-    print(cluster_acc(y, cluster_id))
-
-
-if __name__ == "__main__":
-    main()
