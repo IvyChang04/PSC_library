@@ -102,11 +102,12 @@ class Net(nn.Module):
         x = self.predict(x)
         return x
 
-class Accuracy(nn.Module):
-    def __init__(self):
-        super().__init__()
+class Accuracy:
+    def __init__(self, y_true, y_pred):
+        self.y_true = y_true
+        self.y_pred = y_pred
     
-    def cluster_acc(self, y_true, y_pred):
+    def cluster_acc(self):
         """Calculate clustering accuracy. Require scikit-learn installed.
 
         Parameters
@@ -133,22 +134,22 @@ class Accuracy(nn.Module):
         >>> cluster_acc(y, y_pred)
         0.7935447968836951
         """
-        y_true = y_true.astype(np.int64)
-        assert y_pred.size == y_true.size
-        D = max(y_pred.max(), y_true.max()) + 1
+        self.y_true = self.y_true.astype(np.int64)
+        assert self.y_pred.size == self.y_true.size
+        D = max(self.y_pred.max(), self.y_true.max()) + 1
         w = np.zeros((D, D), dtype=np.int64)
-        for i in range(y_pred.size):
-            w[y_pred[i], y_true[i]] += 1
+        for i in range(self.y_pred.size):
+            w[self.y_pred[i], self.y_true[i]] += 1
         row_ind, col_ind = linear_sum_assignment(w.max() - w)
-        return w[row_ind, col_ind].sum() * 1.0 / y_pred.size
+        return w[row_ind, col_ind].sum() * 1.0 / self.y_pred.size
 
-    def ARI(self, y_true, y_pred):
-        return adjusted_rand_score(y_true, y_pred)
+    def ARI(self):
+        return adjusted_rand_score(self.y_true, self.y_pred)
 
-    def AMI(self, y_true, y_pred):
-        return adjusted_mutual_info_score(y_true, y_pred)
+    def AMI(self):
+        return adjusted_mutual_info_score(self.y_true, self.y_pred)
 
-    def acc_report(self, y_true, y_pred):
+    def acc_report(self):
         """Report the accuracy of clustering.
 
         Parameters
@@ -158,9 +159,9 @@ class Accuracy(nn.Module):
         y_pred : list
             Predicted labels.
         """
-        clusterAcc = self.cluster_acc(y_true=y_true, y_pred=y_pred)
-        ari = self.ARI(y_true=y_true, y_pred=y_pred)
-        ami = self.AMI(y_true=y_true, y_pred=y_pred)
+        clusterAcc = self.cluster_acc(y_true=self.y_true, y_pred=self.y_pred)
+        ari = self.ARI(y_true=self.y_true, y_pred=self.y_pred)
+        ami = self.AMI(y_true=self.y_true, y_pred=self.y_pred)
 
         print(f"Clustering Accuracy: {clusterAcc}")
         print(f"Adjusted rand index: {ari}")
