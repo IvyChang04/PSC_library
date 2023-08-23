@@ -12,12 +12,10 @@ import random
 import time
 import pickle
 import os
+import sys
+import argparse
 
 """
-TODO:
-- Update test_spliting_rate comment
-
-
 Notes:
 - Can't really `catch` segmentation fault in Python since Python's exception handling machanisms are designed
   to catch and handle exceptions raised by Python code itself, not low-system error (like segfault).
@@ -28,6 +26,17 @@ Notes:
 - Using neither Python signal nor subprocess is a reliable way to catch segmentation fault. Besides, both
   methods need to be added by user, which means we can't add this directly into our library code.
 """
+
+# parser
+parser = argparse.ArgumentParser()
+# required parameter
+parser.add_argument("-data", "--train_data", type=str, help="Training data")
+parser.add_argument("-rate", "--test_spliting_rate", type=float, help="The spliting rate of the training data")
+# optional parameter
+parser.add_argument("-m", "--load_save_model", type=str, help="Load/Save model or none")
+parser.add_argument("-c", "--cluster_method", type=str, help="Clustering method, such as kmeans")
+# parser.add_argument("-", "--", type=, help="")
+args = parser.parse_args()
 
 class Net(nn.Module):
     """The model used to learn the embedding.
@@ -93,65 +102,69 @@ class Net(nn.Module):
         x = self.predict(x)
         return x
 
-def cluster_acc(y_true, y_pred):
-    """Calculate clustering accuracy. Require scikit-learn installed.
-
-    Parameters
-    ----------
-    y_true : list
-        True labels.
-    y_pred : list
-        Predicted labels.
+class Accuracy(nn.Module):
+    def __init__(self):
+        super().__init__()
     
-    Returns
-    -------
-    accuracy : float
-        clustering accuracy
+    def cluster_acc(self, y_true, y_pred):
+        """Calculate clustering accuracy. Require scikit-learn installed.
 
-    Examples
-    --------
-    >>> from PSC_lib import cluster_acc
-    >>> from sklearn.datasets import load_digits
-    >>> from sklearn.cluster import KMeans
-    >>> digits = load_digits()
-    >>> X = digits.data/16
-    >>> y = digits.target
-    >>> y_pred = KMeans(n_clusters=10, random_state=0).fit_predict(X)
-    >>> cluster_acc(y, y_pred)
-    0.7935447968836951
-    """
-    y_true = y_true.astype(np.int64)
-    assert y_pred.size == y_true.size
-    D = max(y_pred.max(), y_true.max()) + 1
-    w = np.zeros((D, D), dtype=np.int64)
-    for i in range(y_pred.size):
-        w[y_pred[i], y_true[i]] += 1
-    row_ind, col_ind = linear_sum_assignment(w.max() - w)
-    return w[row_ind, col_ind].sum() * 1.0 / y_pred.size
+        Parameters
+        ----------
+        y_true : list
+            True labels.
+        y_pred : list
+            Predicted labels.
+    
+        Returns
+        -------
+        accuracy : float
+            clustering accuracy
 
-def ARI(y_true, y_pred):
-    return adjusted_rand_score(y_true, y_pred)
+        Examples
+        --------
+        >>> from PSC_lib import cluster_acc
+        >>> from sklearn.datasets import load_digits
+        >>> from sklearn.cluster import KMeans
+        >>> digits = load_digits()
+        >>> X = digits.data/16
+        >>> y = digits.target
+        >>> y_pred = KMeans(n_clusters=10, random_state=0).fit_predict(X)
+        >>> cluster_acc(y, y_pred)
+        0.7935447968836951
+        """
+        y_true = y_true.astype(np.int64)
+        assert y_pred.size == y_true.size
+        D = max(y_pred.max(), y_true.max()) + 1
+        w = np.zeros((D, D), dtype=np.int64)
+        for i in range(y_pred.size):
+            w[y_pred[i], y_true[i]] += 1
+        row_ind, col_ind = linear_sum_assignment(w.max() - w)
+        return w[row_ind, col_ind].sum() * 1.0 / y_pred.size
 
-def AMI(y_true, y_pred):
-    return adjusted_mutual_info_score(y_true, y_pred)
+    def ARI(self, y_true, y_pred):
+        return adjusted_rand_score(y_true, y_pred)
 
-def acc_report(y_true, y_pred):
-    """Report the accuracy of clustering.
+    def AMI(self, y_true, y_pred):
+        return adjusted_mutual_info_score(y_true, y_pred)
 
-    Parameters
-    ----------
-    y_true : list
-        True labels.
-    y_pred : list
-        Predicted labels.
-    """
-    clusterAcc = cluster_acc(y_true=y_true, y_pred=y_pred)
-    ari = ARI(y_true=y_true, y_pred=y_pred)
-    ami = AMI(y_true=y_true, y_pred=y_pred)
+    def acc_report(self, y_true, y_pred):
+        """Report the accuracy of clustering.
 
-    print(f"Clustering Accuracy: {clusterAcc}")
-    print(f"Adjusted rand index: {ari}")
-    print(f"Adjusted mutual information: {ami}")
+        Parameters
+        ----------
+        y_true : list
+            True labels.
+        y_pred : list
+            Predicted labels.
+        """
+        clusterAcc = self.cluster_acc(y_true=y_true, y_pred=y_pred)
+        ari = self.ARI(y_true=y_true, y_pred=y_pred)
+        ami = self.AMI(y_true=y_true, y_pred=y_pred)
+
+        print(f"Clustering Accuracy: {clusterAcc}")
+        print(f"Adjusted rand index: {ari}")
+        print(f"Adjusted mutual information: {ami}")
 
 class PSC:
     """Parametric Spectral Clustering.
@@ -231,10 +244,10 @@ class PSC:
         n_neighbor = 8, 
         sigma = 1, 
         k = 10, 
-        model = None,
+        model = Net(64, 128, 256, 64, 10),
         criterion = nn.MSELoss(),
         epochs = 50,
-        clustering_method = None,
+        clustering_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan'),
         test_spliting_rate = 0.3
         ) -> None:
 
@@ -455,22 +468,34 @@ class PSC:
         with open(path, 'rb') as f:
                 self.model = pickle.load(f)
 
-def main():
+def main(argv):
+    print(args.train_data)
+    print(args.test_spliting_rate)
+    # parser
+    # x = np.loadtxt(args.train_data, dtype=int)
+    x = np.load(args.train_data)
+    print(x)
+    # f = open(args.train_data, "r")
+    # x = f.read()
+    psc = PSC(test_spliting_rate=args.test_spliting_rate)
+    psc.fit_predict(x)
+
+    ###################################################################################################
     # data
-    digits = load_digits()
-    X = digits.data/16
-    y = digits.target
-    clust_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    model = Net(64, 128, 256, 64, 10)
+    # digits = load_digits()
+    # X = digits.data/16
+    # y = digits.target
+    # clust_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
+    # model = Net(64, 128, 256, 64, 10)
 
     # test fit_predict()
-    psc = PSC(model=model, clustering_method=clust_method, test_spliting_rate=0)
+    # psc = PSC(model=model, clustering_method=clust_method, test_spliting_rate=0)
 
-    time1 = round(time.time()*1000)
-    cluster_id = psc.fit_predict(X)
-    time2 = round(time.time()*1000)
-    print(f"time spent: {time2 - time1} milliseconds")
-    acc_report(y, cluster_id)
+    # time1 = round(time.time()*1000)
+    # cluster_id = psc.fit_predict(X)
+    # time2 = round(time.time()*1000)
+    # print(f"time spent: {time2 - time1} milliseconds")
+    # acc_report(y, cluster_id)
 
     # test fit and predict
     # psc = PSC(model=model, clustering_method=clust_method)
@@ -484,8 +509,7 @@ def main():
     # test_clust.load_model("test")
     # cluster_id = test_clust.predict(X)
 
-    print(cluster_acc(y, cluster_id))
-
+    # print(cluster_acc(y, cluster_id))
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
