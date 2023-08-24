@@ -12,6 +12,7 @@ requirements = [
     'numpy >= 1.19.2',
     'scikit-learn >= 1.1.2',
     'scipy >= 1.7.3'
+    'pandas >= 1.5.3'
 ]
 
 setup (
