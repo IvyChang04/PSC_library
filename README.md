@@ -1,7 +1,7 @@
 <!-- Parametric Spectral Clustering -->
 # Parametric Spectral Clustering
 
-This repository provides a PyTorch implementation of the **Parametric Spectral Clustering** (PSC) algorithm. PSC is a novel spectral clustering algorithm that overcomes the limitations of the traditional spectral clustering algorithm at computational limitations, memory requirements, and inability to perform online learning. PSC is a general framework that can be applied to any spectral clustering algorithm. In this repository, we provide an example of PSC with the K-means clustering algorithm.
+This repository provides a PyTorch implementation of the **Parametric Spectral Clustering** (PSC) algorithm, which offers a new approach to the traditional spectral clustering algorithm. PSC addresses issues related to computational efficiency, memory usage, and the absence of online learning capabilities. It serves as a versatile framework suitable for applying spectral clustering to large datasets.
 
 <!-- PREREQUISITES -->
 # Installation
