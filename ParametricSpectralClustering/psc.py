@@ -74,8 +74,9 @@ class Net(nn.Module):
         x = self.predict(x)
         return x
 
-def cluster_acc(y_true, y_pred):
-    """Calculate clustering accuracy. Require scikit-learn installed.
+
+class Accuracy:
+    """Calculate the accuracy of clustering.
 
     Parameters
     ----------
@@ -84,55 +85,85 @@ def cluster_acc(y_true, y_pred):
     y_pred : list
         Predicted labels.
     
-    Returns
-    -------
-    accuracy : float
-        clustering accuracy
-
+    Attributes
+    ----------
+    y_true : list
+        True labels.
+    y_pred : list
+        Predicted labels.
+    
     Examples
     --------
-    >>> from PSC_lib import cluster_acc
+    >>> from PSC_lib import Accuracy
     >>> from sklearn.datasets import load_digits
     >>> from sklearn.cluster import KMeans
     >>> digits = load_digits()
     >>> X = digits.data/16
     >>> y = digits.target
     >>> y_pred = KMeans(n_clusters=10, random_state=0).fit_predict(X)
-    >>> cluster_acc(y, y_pred)
-    0.7935447968836951
+    >>> acc = Accuracy(y, y_pred)
+    >>> acc.acc_report()
+    Clustering Accuracy: 0.7935447968836951
+    Adjusted rand index: 0.670943009820327
+    Adjusted mutual information: 0.7481788599584174
     """
-    y_true = y_true.astype(np.int64)
-    assert y_pred.size == y_true.size
-    D = max(y_pred.max(), y_true.max()) + 1
-    w = np.zeros((D, D), dtype=np.int64)
-    for i in range(y_pred.size):
-        w[y_pred[i], y_true[i]] += 1
-    row_ind, col_ind = linear_sum_assignment(w.max() - w)
-    return w[row_ind, col_ind].sum() * 1.0 / y_pred.size
+    def __init__(self, y_true, y_pred):
+        self.y_true = y_true
+        self.y_pred = y_pred
+    
+    def cluster_acc(self):
+        """Calculate the clustering accuracy.
 
-def ARI(y_true, y_pred):
-    return adjusted_rand_score(y_true, y_pred)
+        Parameters
+        ----------
+        self : object
+            The instance itself.
+        """
+        self.y_true = self.y_true.astype(np.int64)
+        assert self.y_pred.size == self.y_true.size
+        D = max(self.y_pred.max(), self.y_true.max()) + 1
+        w = np.zeros((D, D), dtype=np.int64)
+        for i in range(self.y_pred.size):
+            w[self.y_pred[i], self.y_true[i]] += 1
+        row_ind, col_ind = linear_sum_assignment(w.max() - w)
+        return w[row_ind, col_ind].sum() * 1.0 / self.y_pred.size
 
-def AMI(y_true, y_pred):
-    return adjusted_mutual_info_score(y_true, y_pred)
+    def ARI(self):
+        """Calculate the adjusted rand index.
+        
+        Parameters
+        ----------
+        self : object
+            The instance itself.
+        """
+        return adjusted_rand_score(self.y_true, self.y_pred)
 
-def acc_report(y_true, y_pred):
-    """Report the accuracy of clustering.
+    def AMI(self):
+        """Calculate the adjusted mutual information.
 
-    Parameters
-    ----------
-    y_true : list
-        True labels.
-    y_pred : list
-        Predicted labels.
-    """
-    clusterAcc = cluster_acc(y_true=y_true, y_pred=y_pred)
-    ari = ARI(y_true=y_true, y_pred=y_pred)
-    ami = AMI(y_true=y_true, y_pred=y_pred)
+        Parameters
+        ----------
+        self : object
+            The instance itself.
+        """
+        return adjusted_mutual_info_score(self.y_true, self.y_pred)
 
-    print(f"Clustering Accuracy: {clusterAcc}")
-    print(f"Adjusted rand index: {ari}")
-    print(f"Adjusted mutual information: {ami}")
+    def acc_report(self):
+        """Report the accuracy of clustering.
+
+        Parameters
+        ----------
+        self : object
+            The instance itself.
+        """
+        clusterAcc = self.cluster_acc()
+        ari = self.ARI()
+        ami = self.AMI()
+
+        print(f"Clustering Accuracy: {clusterAcc}")
+        print(f"Adjusted rand index: {ari}")
+        print(f"Adjusted mutual information: {ami}")
+
 
 class PSC:
     """Parametric Spectral Clustering.
@@ -435,3 +466,4 @@ class PSC:
         
         with open(path, 'rb') as f:
                 self.model = pickle.load(f)
+
