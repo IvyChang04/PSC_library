@@ -31,14 +31,14 @@ Notes:
 """
 Command:
 
-python PSC_lib.py [train_data] [n_cluster] [test_spliting_rate]
+python PSC_lib.py [train_data] [n_cluster] [test_splitting_rate]
 """
 
 # parser
 parser = argparse.ArgumentParser()
 parser.add_argument("-data", "--train_data", type=str, help="Training data")
 parser.add_argument("-n_cluster", "--n_cluster", type=int, help="Number of clusters")
-parser.add_argument("-rate", "--test_spliting_rate", type=float, help="The spliting rate of the training data")
+parser.add_argument("-rate", "--test_splitting_rate", type=float, help="The splitting rate of the training data")
 args = parser.parse_args()
 
 class Net(nn.Module):
@@ -228,7 +228,7 @@ class PSC:
         The model used to learn the embedding.
     criterion : torch.nn.modules.loss
         The loss function used to train the model.
-    test_spliting_rate : float
+    test_splitting_rate : float
         The spliting rate of the training data.
     optimizer : torch.optim
         The optimizer used to train the model.
@@ -276,7 +276,7 @@ class PSC:
         criterion = nn.MSELoss(),
         epochs = 50,
         clustering_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan'),
-        test_spliting_rate = 0.3
+        test_splitting_rate = 0.3
         ) -> None:
 
         self.n_neighbor = n_neighbor
@@ -284,7 +284,7 @@ class PSC:
         self.k = k
         self.model = model
         self.criterion = criterion
-        self.test_spliting_rate = test_spliting_rate
+        self.test_splitting_rate = test_splitting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
 
         self.epochs = epochs
@@ -373,12 +373,12 @@ class PSC:
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
-        if self.test_spliting_rate == 0:
+        if self.test_splitting_rate == 0:
             X_train, x_train = X, x
         
         else:
             X_train, _, x_train, _ = train_test_split(
-                X, x, test_size=self.test_spliting_rate, random_state=random.randint(1, 100))
+                X, x, test_size=self.test_splitting_rate, random_state=random.randint(1, 100))
 
         self.__train_model(X_train, x_train)
 
@@ -411,12 +411,12 @@ class PSC:
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
-        if self.test_spliting_rate == 0:
+        if self.test_splitting_rate == 0:
             X_train, x_train = X, x
         
         else:
             X_train, _, x_train, _ = train_test_split(
-                X, x, test_size=self.test_spliting_rate, random_state=random.randint(1, 100))
+                X, x, test_size=self.test_splitting_rate, random_state=random.randint(1, 100))
 
         self.__train_model(X_train, x_train)
         U = self.model(x).detach().numpy()
@@ -496,8 +496,7 @@ class PSC:
         with open(path, 'rb') as f:
                 self.model = pickle.load(f)
 
-def main(argv):
-    # parse arguments
+def __check_args():
     if args.train_data is not None and args.train_data[-3:] not in ["npy", "csv", "txt"]:
         raise ValueError(
             "The training data must be in .npy, .csv or .txt format."
@@ -506,11 +505,12 @@ def main(argv):
         raise ValueError(
             "n_cluster must be integer and greater than 0."
         )
-    if args.test_spliting_rate is not None and (args.test_spliting_rate <= 0 or args.test_spliting_rate > 1):
+    if args.test_splitting_rate is not None and (args.test_splitting_rate <= 0 or args.test_splitting_rate > 1):
         raise ValueError(
-            "Test_spliting_rate must be floating point and between 0 and 1."
-        )
-    
+            "Test_splitting_rate must be floating point and between 0 and 1."
+        )    
+
+def __load_data():
     if args.train_data[-3:] == "npy":
         # load from npy
         x = np.load(args.train_data)
@@ -522,19 +522,27 @@ def main(argv):
         # load from txt
         x = np.loadtxt(args.train_data, dtype=int)
 
+    return x
+
+def main(argv):
+
+    __check_args()
+    
+    x = __load_data()
+
     # modify n_cluster or not
     if args.n_cluster is not None:
         cluster_method = KMeans(n_clusters=args.n_cluster, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-        psc = PSC(clustering_method=cluster_method, test_spliting_rate=args.test_spliting_rate)
+        psc = PSC(clustering_method=cluster_method, test_splitting_rate=args.test_splitting_rate)
         cluster_idx = psc.fit_predict(x)
     else:
-        psc = PSC(test_spliting_rate=args.test_spliting_rate)
+        psc = PSC(test_splitting_rate=args.test_splitting_rate)
         cluster_idx = psc.fit_predict(x)
-        
-    digits = load_digits()
-    y = digits.target
-    acc = Accuracy(y_true=y, y_pred=cluster_idx)
-    acc.acc_report()
+
+    # digits = load_digits()
+    # y = digits.target
+    # acc = Accuracy(y_true=y, y_pred=cluster_idx)
+    # acc.acc_report()
 
     # save to csv
     df = pd.DataFrame(cluster_idx)
@@ -562,7 +570,7 @@ def main(argv):
     # df.to_csv("X.csv", index=False, header=False)
 
     # test fit_predict()
-    # psc = PSC(model=model, clustering_method=clust_method, test_spliting_rate=0)
+    # psc = PSC(model=model, clustering_method=clust_method, test_splitting_rate=0)
 
     # time1 = round(time.time()*1000)
     # cluster_id = psc.fit_predict(X)

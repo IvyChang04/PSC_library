@@ -1,5 +1,4 @@
-- [ ] Make sure the information in setup.py is correct
-  - [ ] author name
-  - [ ] author email
-  - [ ] requirements
-- [ ] Update README
+- [ ] Update README (command line tool part)
+- [ ] add setup.py scripts
+- [ ] check main function
+- [ ] update test.pypi
