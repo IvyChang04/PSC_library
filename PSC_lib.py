@@ -498,6 +498,19 @@ class PSC:
 
 def main(argv):
     # parse arguments
+    if args.train_data is not None and args.train_data[-3:] not in ["npy", "csv", "txt"]:
+        raise ValueError(
+            "The training data must be in .npy, .csv or .txt format."
+        )
+    if args.n_cluster is not None and args.n_cluster <= 0:
+        raise ValueError(
+            "n_cluster must be integer and greater than 0."
+        )
+    if args.test_spliting_rate is not None and (args.test_spliting_rate <= 0 or args.test_spliting_rate > 1):
+        raise ValueError(
+            "Test_spliting_rate must be floating point and between 0 and 1."
+        )
+    
     if args.train_data[-3:] == "npy":
         # load from npy
         x = np.load(args.train_data)
