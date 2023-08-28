@@ -47,8 +47,17 @@ Using UCI ML hand-written digits datasets as an example.
 
 <!-- COMMEND LINE TOOL -->
 ## Command line tool
+After installation, you may run the following scripts directly.
 
-TODO
+```sh
+python PSC_lib.py [train_data] [n_cluster] [test_splitting_rate]
+```
+
+The ``[train_data]`` can accept .txt, .csv, and .npy format of data.
+
+The ``[n_cluster]`` is the number of clusters to form as well as the number of centroids to generate.
+
+The ``[test_splitting_rate]`` should be in float, between 0.0 and 1.0 and represent the proportion of the dataset to include in the test split.
 
 <!-- LICENSE -->
 ## License
