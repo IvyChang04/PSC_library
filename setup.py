@@ -15,6 +15,10 @@ requirements = [
     'pandas >= 1.5.3'
 ]
 
+scripts = [
+    'bin/run_psc.py'
+]
+
 setup (
     name='ParametricSpectralClustering',
     version='0.0.14',
@@ -31,4 +35,5 @@ setup (
     include_package_data=True,
     zip_safe=False,
     python_requires = ">=3.8",
+    scripts=scripts
 )
