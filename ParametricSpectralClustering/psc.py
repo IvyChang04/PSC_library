@@ -199,7 +199,7 @@ class PSC:
         The model used to learn the embedding.
     criterion : torch.nn.modules.loss
         The loss function used to train the model.
-    test_spliting_rate : float
+    test_splitting_rate : float
         The spliting rate of the training data.
     optimizer : torch.optim
         The optimizer used to train the model.
@@ -247,7 +247,7 @@ class PSC:
         criterion = nn.MSELoss(),
         epochs = 50,
         clustering_method = None,
-        test_spliting_rate = 0.3
+        test_splitting_rate = 0.3
         ) -> None:
 
         self.n_neighbor = n_neighbor
@@ -255,7 +255,7 @@ class PSC:
         self.k = k
         self.model = model
         self.criterion = criterion
-        self.test_spliting_rate = test_spliting_rate
+        self.test_splitting_rate = test_splitting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr = 0.001)
 
         self.epochs = epochs
@@ -344,12 +344,12 @@ class PSC:
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
-        if self.test_spliting_rate == 0:
+        if self.test_splitting_rate == 0:
             X_train, x_train = X, x
         
         else:
             X_train, _, x_train, _ = train_test_split(
-                X, x, test_size=self.test_spliting_rate, random_state=random.randint(1, 100))
+                X, x, test_size=self.test_splitting_rate, random_state=random.randint(1, 100))
 
         self.__train_model(X_train, x_train)
 
@@ -382,12 +382,12 @@ class PSC:
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
-        if self.test_spliting_rate == 0:
+        if self.test_splitting_rate == 0:
             X_train, x_train = X, x
         
         else:
             X_train, _, x_train, _ = train_test_split(
-                X, x, test_size=self.test_spliting_rate, random_state=random.randint(1, 100))
+                X, x, test_size=self.test_splitting_rate, random_state=random.randint(1, 100))
 
         self.__train_model(X_train, x_train)
         U = self.model(x).detach().numpy()

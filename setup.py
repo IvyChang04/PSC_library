@@ -11,7 +11,7 @@ requirements = [
     'torch >= 1.12.1',
     'numpy >= 1.19.2',
     'scikit-learn >= 1.1.2',
-    'scipy >= 1.7.3'
+    'scipy >= 1.7.3',
     'pandas >= 1.5.3'
 ]
 
@@ -21,7 +21,7 @@ scripts = [
 
 setup (
     name='ParametricSpectralClustering',
-    version='0.0.14',
+    version='0.0.18',
     description='A library for users to use parametric spectral clustering',
     long_description=open("README.md").read() + '\n\n' + open("CHANGELOG.txt").read(),
     long_description_content_type = "text/markdown",

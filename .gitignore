@@ -6,3 +6,5 @@ ParametricSpectralClustering/__pycache__/
 CHANGELOG.txt
 PSC_lib.py
 test.py
+digits.npy
+digits_cluster_result.*

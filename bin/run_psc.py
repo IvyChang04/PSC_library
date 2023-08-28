@@ -3,15 +3,17 @@ import sys
 import argparse
 import pandas as pd
 from sklearn.cluster import KMeans
-from ParametricSpectralClustering import PSC
+from ParametricSpectralClustering import PSC, Net
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-data", "--train_data", type=str,
                     help="Training data")
 parser.add_argument("-n_cluster", "--n_cluster", type=int,
+                    default=10,
                     help="Number of clusters")
 parser.add_argument("-rate", "--test_splitting_rate", type=float,
+                    default=0.3,
                     help="The splitting rate of the training data")
 args = parser.parse_args()
 
@@ -49,12 +51,14 @@ def main(argv):
 
     x = __load_data()
 
+    model = Net(64, 128, 256, 64, 10)
+
     if args.n_cluster is not None:
         cluster_method = KMeans(n_clusters=args.n_cluster, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-        psc = PSC(clustering_method=cluster_method, test_splitting_rate=args.test_splitting_rate)
+        psc = PSC(clustering_method=cluster_method, test_splitting_rate=args.test_splitting_rate, model=model)
         cluster_idx = psc.fit_predict(x)
     else:
-        psc = PSC(test_splitting_rate=args.test_splitting_rate)
+        psc = PSC(test_splitting_rate=args.test_splitting_rate, model=model)
         cluster_idx = psc.fit_predict(x)
 
     # save to csv
@@ -64,9 +68,10 @@ def main(argv):
     # save to txt
     f = open(args.train_data[:-4]+"_cluster_result.txt", "w")
     np.set_printoptions(threshold=sys.maxsize)
-    print(cluster_idx)
+    # print(cluster_idx)
     f.write(str(cluster_idx) + " ")
     f.close()
+    print("Finished")
 
 if __name__ == "__main__":
     main(sys.argv)
