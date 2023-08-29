@@ -4,6 +4,7 @@ from scipy.optimize import linear_sum_assignment
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from sklearn.cluster import KMeans
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score
 import random
@@ -243,10 +244,10 @@ class PSC:
         n_neighbor = 8, 
         sigma = 1, 
         k = 10, 
-        model = None,
+        model = Net(64, 128, 256, 64, 10),
         criterion = nn.MSELoss(),
         epochs = 50,
-        clustering_method = None,
+        clustering_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan'),
         test_splitting_rate = 0.3
         ) -> None:
 
@@ -282,7 +283,7 @@ class PSC:
         U=U/((np.sum(U**2,axis=1)**0.5)[:,None])
         return U
 
-    def __train(self):
+    def __loss_calculation(self):
         running_loss = 0.0
 
         for inputs, labels in self.dataloader:
@@ -304,7 +305,7 @@ class PSC:
         self.dataloader = dataloader
 
         for _ in range(self.epochs):
-            loss = self.__train()
+            loss = self.__loss_calculation()
             if(loss < 0.00015):
                 break
 
@@ -326,19 +327,7 @@ class PSC:
                 "No model assigned."
             )
 
-    def fit(self, X):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training data.
-
-        Returns
-        -------
-        self : object
-            Returns the instance itself.        
-        """
+    def training_psc_model(self, X):
         self.__check_clustering_method()
         self.__check_model()
 
@@ -354,6 +343,23 @@ class PSC:
         self.__train_model(X_train, x_train)
 
         U = self.model(x).detach().numpy()
+
+        return U
+
+    def fit(self, X):
+        """Fit the model according to the given training data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training data.
+
+        Returns
+        -------
+        self : object
+            Returns the instance itself.        
+        """
+        U = self.training_psc_model(X)
         
         if hasattr(self.clustering, "fit") is False:
             raise AttributeError(
@@ -377,27 +383,13 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        self.__check_clustering_method()
-        self.__check_model()
-
-        x = torch.from_numpy(X).type(torch.FloatTensor)
-
-        if self.test_splitting_rate == 0:
-            X_train, x_train = X, x
-        
-        else:
-            X_train, _, x_train, _ = train_test_split(
-                X, x, test_size=self.test_splitting_rate, random_state=random.randint(1, 100))
-
-        self.__train_model(X_train, x_train)
-        U = self.model(x).detach().numpy()
+        U = self.training_psc_model(X)
 
         if hasattr(self.clustering, "fit_predict") is False:
             raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'fit_predict'"
             )
 
-        # if hasattr(self.clustering, "fit_predict"):
         return self.clustering.fit_predict(U)
 
     # predict the closest cluster

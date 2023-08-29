@@ -3,8 +3,7 @@ import sys
 import argparse
 import pandas as pd
 from sklearn.cluster import KMeans
-from ParametricSpectralClustering import PSC, Net
-
+from ParametricSpectralClustering import PSC
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-data", "--train_data", type=str,
@@ -12,9 +11,11 @@ parser.add_argument("-data", "--train_data", type=str,
 parser.add_argument("-n_cluster", "--n_cluster", type=int,
                     default=10,
                     help="Number of clusters")
-parser.add_argument("-rate", "--test_splitting_rate", type=float,
-                    default=0.3,
-                    help="The splitting rate of the training data")
+parser.add_argument("-path", "--model_path", type=str, 
+                    help="The pretrained model path")
+parser.add_argument("-saving_format", "--result_saving_format", type=str,
+                    default="csv",
+                    help="Save the result in csv format or txt format")
 args = parser.parse_args()
 
 
@@ -26,11 +27,15 @@ def __check_args():
     if args.n_cluster is not None and args.n_cluster <= 0:
         raise ValueError(
             "n_cluster must be integer and greater than 0."
-        )
-    if args.test_splitting_rate is not None and (args.test_splitting_rate <= 0 or args.test_splitting_rate > 1):
+        ) 
+    if args.model_path is None:
         raise ValueError(
-            "Test_splitting_rate must be floating point and between 0 and 1."
-        )    
+            "Model path not assigned."
+        )
+    if args.result_saving_format is not None and args.result_saving_format not in ["csv", "txt"]:
+        raise ValueError(
+            "The saving format must be in .csv or .txt."
+        )
 
 def __load_data():
     if args.train_data[-3:] == "npy":
@@ -51,29 +56,21 @@ def main(argv):
 
     x = __load_data()
 
-    model = Net(64, 128, 256, 64, 10)
-
-    # if args.n_cluster is not None:
-    #     cluster_method = KMeans(n_clusters=args.n_cluster, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    #     psc = PSC(clustering_method=cluster_method, test_splitting_rate=args.test_splitting_rate, model=model)
-    #     cluster_idx = psc.fit_predict(x)
-    # else:
-    #     psc = PSC(test_splitting_rate=args.test_splitting_rate, model=model)
-    #     cluster_idx = psc.fit_predict(x)
     cluster_method = KMeans(n_clusters=args.n_cluster, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    psc = PSC(clustering_method=cluster_method, test_splitting_rate=args.test_splitting_rate, model=model)
-    cluster_idx = psc.fit_predict(x)
+    psc = PSC(clustering_method=cluster_method, test_splitting_rate=0)
+    psc.load_model(args.model_path)
+    cluster_idx = psc.predict(x)
 
-    # save to csv
-    df = pd.DataFrame(cluster_idx)
-    df.to_csv(args.train_data[:-4]+"_cluster_result.csv", index=False, header=False)
+    if args.result_saving_format == "csv":
+        df = pd.DataFrame(cluster_idx)
+        df.to_csv(args.train_data[:-4]+"_cluster_result.csv", index=False, header=False)
+    elif args.result_saving_format == "txt":
+        f = open(args.train_data[:-4]+"_cluster_result.txt", "w")
+        np.set_printoptions(threshold=sys.maxsize)
+        # print(cluster_idx)
+        f.write(str(cluster_idx) + " ")
+        f.close()
 
-    # save to txt
-    f = open(args.train_data[:-4]+"_cluster_result.txt", "w")
-    np.set_printoptions(threshold=sys.maxsize)
-    # print(cluster_idx)
-    f.write(str(cluster_idx) + " ")
-    f.close()
     print("Finished")
 
 if __name__ == "__main__":
