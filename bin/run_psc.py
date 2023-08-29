@@ -53,13 +53,16 @@ def main(argv):
 
     model = Net(64, 128, 256, 64, 10)
 
-    if args.n_cluster is not None:
-        cluster_method = KMeans(n_clusters=args.n_cluster, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-        psc = PSC(clustering_method=cluster_method, test_splitting_rate=args.test_splitting_rate, model=model)
-        cluster_idx = psc.fit_predict(x)
-    else:
-        psc = PSC(test_splitting_rate=args.test_splitting_rate, model=model)
-        cluster_idx = psc.fit_predict(x)
+    # if args.n_cluster is not None:
+    #     cluster_method = KMeans(n_clusters=args.n_cluster, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
+    #     psc = PSC(clustering_method=cluster_method, test_splitting_rate=args.test_splitting_rate, model=model)
+    #     cluster_idx = psc.fit_predict(x)
+    # else:
+    #     psc = PSC(test_splitting_rate=args.test_splitting_rate, model=model)
+    #     cluster_idx = psc.fit_predict(x)
+    cluster_method = KMeans(n_clusters=args.n_cluster, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
+    psc = PSC(clustering_method=cluster_method, test_splitting_rate=args.test_splitting_rate, model=model)
+    cluster_idx = psc.fit_predict(x)
 
     # save to csv
     df = pd.DataFrame(cluster_idx)
