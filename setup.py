@@ -8,20 +8,22 @@ classifiers = [
 ]
 
 requirements = [
-    'torch >= 1.12.1',
-    'numpy >= 1.19.2',
-    'scikit-learn >= 1.1.2',
-    'scipy >= 1.7.3',
-    'pandas >= 1.5.3'
+    'torch',
+    'numpy',
+    'scikit-learn',
+    'scipy',
+    'pandas',
 ]
 
 scripts = [
-    'bin/run_psc.py'
+    'bin/clustering.py',
+    'bin/train_psc.py',
+    'bin/run.py',
 ]
 
 setup (
     name='ParametricSpectralClustering',
-    version='0.0.18',
+    version='0.0.19',
     description='A library for users to use parametric spectral clustering',
     long_description=open("README.md").read() + '\n\n' + open("CHANGELOG.txt").read(),
     long_description_content_type = "text/markdown",

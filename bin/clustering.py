@@ -34,7 +34,7 @@ def __check_args():
         )
     if args.result_saving_format is not None and args.result_saving_format not in ["csv", "txt"]:
         raise ValueError(
-            "The saving format must be in .csv or .txt."
+            "The saving format must be .csv or .txt."
         )
 
 def __load_data():
