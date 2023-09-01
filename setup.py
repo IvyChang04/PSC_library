@@ -21,6 +21,13 @@ scripts = [
     'bin/run.py',
 ]
 
+keywords = [
+    'Spectral Clustering',
+    'Incremental Clustering',
+    'Online Clustering',
+    'Non-linear clustering',
+]
+
 setup (
     name='ParametricSpectralClustering',
     version='0.0.19',
@@ -29,6 +36,7 @@ setup (
     long_description_content_type = "text/markdown",
     packages=find_packages(exclude=["tests*"]),
     classifiers=classifiers,
+    keywords=keywords,
     url='',
     author='Ivy Chang, Hsin Ju Tai',
     author_email='ivy900403@gmail.com, luludai020127@gmail.com',
