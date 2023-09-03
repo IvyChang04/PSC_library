@@ -8,3 +8,4 @@ PSC_lib.py
 test.py
 digits.npy
 digits_cluster_result.*
+unittest_example.py
