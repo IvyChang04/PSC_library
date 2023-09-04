@@ -1,11 +1,11 @@
 import unittest
-from ParametricSpectralClustering import PSC, Net
+from ParametricSpectralClustering import PSC, Four_layer_FNN
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_digits
 
 digits = load_digits()
 x = digits.data/16
-model = Net(64, 128, 256, 64, 10)
+model = Four_layer_FNN(64, 128, 256, 64, 10)
 clustering_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
 
 class NullClusteringMethod():

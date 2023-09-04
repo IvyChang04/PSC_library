@@ -11,7 +11,7 @@ import random
 import pickle
 import os
 
-class Net(nn.Module):
+class Four_layer_FNN(nn.Module):
     """The model used to learn the embedding.
     
     Parameters
@@ -40,9 +40,9 @@ class Net(nn.Module):
     
     Examples
     --------
-    >>> model = Net(64, 128, 256, 64, 10)
+    >>> model = Four_layer_FNN(64, 128, 256, 64, 10)
     >>> model
-    Net(
+    Four_layer_FNN(
         (hidden1): Linear(in_features=64, out_features=128, bias=True)
         (hidden2): Linear(in_features=128, out_features=256, bias=True)
         (hidden3): Linear(in_features=256, out_features=64, bias=True)
@@ -95,7 +95,7 @@ class Accuracy:
     
     Examples
     --------
-    >>> from PSC_lib import Accuracy
+    >>> from ParametricSpectralClustering import import Accuracy
     >>> from sklearn.datasets import load_digits
     >>> from sklearn.cluster import KMeans
     >>> digits = load_digits()
@@ -215,26 +215,26 @@ class PSC:
 
     Examples
     --------
-    >>> from PSC_lib import PSC, Net
+    >>> from PSC_lib import PSC, Four_layer_FNN
     >>> from sklearn.datasets import load_digits
     >>> from sklearn.cluster import KMeans
     >>> digits = load_digits()
     >>> X = digits.data/16
     >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    >>> model = Net(64, 128, 256, 64, 10)
+    >>> model = Four_layer_FNN(64, 128, 256, 64, 10)
     >>> psc = PSC(model=model, clustering_method=cluster_method)
     >>> psc.fit(X)
     Start training
     >>> psc.save_model("model")
     >>> cluster_idx = psc.predict(X)
 
-    >>> from PSC_lib import PSC, Net
+    >>> from PSC_lib import PSC, Four_layer_FNN
     >>> from sklearn.datasets import load_digits
     >>> from sklearn.cluster import KMeans
     >>> digits = load_digits()
     >>> X = digits.data/16
     >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
-    >>> model = Net(64, 128, 256, 64, 10)
+    >>> model = Four_layer_FNN(64, 128, 256, 64, 10)
     >>> psc = PSC(model=model, clustering_method=cluster_method)
     >>> psc.load_model("model")
     >>> cluster_idx = psc.predict(X)
@@ -244,7 +244,7 @@ class PSC:
         n_neighbor = 8, 
         sigma = 1, 
         k = 10, 
-        model = Net(64, 128, 256, 64, 10),
+        model = Four_layer_FNN(64, 128, 256, 64, 10),
         criterion = nn.MSELoss(),
         epochs = 50,
         clustering_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan'),
@@ -264,7 +264,7 @@ class PSC:
         self.model_fitted = False
 
     # input 轉換成做kmeans之前的matrix
-    def __spectral_clustering(self, X):
+    def __matrix_before_psc(self, X):
         dist  = cdist(X, X, "euclidean")
         S = np.zeros(dist.shape)
         neighbor_index = np.argsort(dist, axis = 1)[:, 1:self.n_neighbor + 1]
@@ -299,7 +299,7 @@ class PSC:
     def __train_model(self, X, x):
         self.model_fitted = True
         print("Start training")
-        u = torch.from_numpy(self.__spectral_clustering(X)).type(torch.FloatTensor)
+        u = torch.from_numpy(self.__matrix_before_psc(X)).type(torch.FloatTensor)
         dataset = torch.utils.data.TensorDataset(x, u)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size = 50, shuffle = True)
         self.dataloader = dataloader

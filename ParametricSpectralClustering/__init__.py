@@ -1,5 +1,5 @@
 from .psc import(
-    Net,
+    Four_layer_FNN,
     Accuracy,
     PSC
 )

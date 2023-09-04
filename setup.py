@@ -4,8 +4,7 @@ classifiers = [
     'Development Status :: 3 - Alpha',
     'License :: OSI Approved :: MIT License',
     'Programming Language :: Python :: 3.8',
-    'Topic :: Scientific/Engineering',
-    'Topic :: Artificail Intelligence',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
 ]
 
 requirements = [
@@ -31,7 +30,7 @@ keywords = [
 
 setup (
     name='ParametricSpectralClustering',
-    version='0.0.19',
+    version='0.0.21',
     description='A library for users to use parametric spectral clustering',
     long_description=open("README.md").read() + '\n\n' + open("CHANGELOG.txt").read(),
     long_description_content_type = "text/markdown",
