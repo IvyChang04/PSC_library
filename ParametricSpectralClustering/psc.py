@@ -328,6 +328,19 @@ class PSC:
             )
 
     def training_psc_model(self, X):
+        """Train the model and return the embedding.
+        
+        Parameters
+        ----------
+        X : array-like of shape
+            Training data.
+        
+        Returns
+        -------
+        U : array-like of shape
+            The embedding of the training data.
+        """
+        
         self.__check_clustering_method()
         self.__check_model()
 

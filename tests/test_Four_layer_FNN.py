@@ -1,9 +1,4 @@
 import unittest
-
-import sys,os
-SCRIPT_DIR = os.path.dirname(os.path.abspath("ParametricSpectralClustering"))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
 from ParametricSpectralClustering import Four_layer_FNN
 import torch
 import numpy as np
