@@ -58,24 +58,6 @@ class Autoencoder(nn.Module):
         x = self.decoder(x)
         return x
 
-class Dimen_Reduct_Model(nn.Module):
-    def __init__(self):
-        super(Dimen_Reduct_Model, self).__init__()
-        self.classifier = nn.Sequential(
-            nn.Linear(49, 196),
-            nn.ReLU(inplace=False),
-            nn.Linear(196, 392),
-            nn.ReLU(inplace=False),
-            nn.Linear(392, 196),
-            nn.ReLU(inplace=False),
-            nn.Linear(196, 10)
-        )
-        
-    def forward(self, x):
-        x = self.classifier(x)
-        return x
-
-
 train_data = datasets.FashionMNIST(
     root="data",
     train=True,
@@ -92,7 +74,7 @@ train_loader = DataLoader(train_data, batch_size=24, shuffle=True)
 test_loader = DataLoader(test_data, batch_size=24, shuffle=True)
 
 autoencoder = Autoencoder()
-autoencoder = torch.load("experiment\autoencoder.pth")
+autoencoder = torch.load("experiment\\autoencoder.pth")
 
 train_num = 60000
 cut_1 = 30000
@@ -111,7 +93,6 @@ print("finish data transformation")
 kmeans = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
 sc = SpectralClustering(n_clusters=10, assign_labels='discretize', random_state=0)
 model = Four_layer_FNN(49, 196, 392, 196, 10)
-psc = PSC(model=model, clustering_method=sc, test_splitting_rate=0.7)
 
 # kmeans
 print("\nkmeans")
@@ -133,26 +114,9 @@ acc.acc_report()
 # acc = Accuracy(y_true=y_train, y_pred=SC_index)
 # acc.acc_report()
 
-# PSC + sc
-# print("\nPSC + sc")
-# time1 = round(time.time()*1000)
-# PSC_index_1 = psc.fit_predict(X_train_1)
-# time2 = round(time.time()*1000)
-# print(f"PSC time spent: {time2 - time1} milliseconds")
-# acc = Accuracy(y_true=y_train[:cut_1], y_pred=PSC_index_1)
-# acc.acc_report()
-
-# time1 = round(time.time()*1000)
-# PSC_index_2 = psc.predict(X_train_2)
-# time2 = round(time.time()*1000)
-# print(f"PSC time spent: {time2 - time1} milliseconds")
-
-# acc = Accuracy(y_true=y_train[cut_1:], y_pred=PSC_index_2)
-# acc.acc_report()
-
-psc = PSC(model=model, clustering_method=kmeans, test_splitting_rate=0.7)
 
 # PSC + kmeans
+psc = PSC(model=model, clustering_method=kmeans, test_splitting_rate=0.7)
 print("\nPSC + kmeans")
 print("\nfit_predict() for 30000 data")
 time1 = round(time.time()*1000)
@@ -175,4 +139,73 @@ acc.acc_report()
 print("\naccuracy rate for 60000 data")
 result = np.concatenate((PSC_index_1, PSC_index_2), axis=0)
 acc = Accuracy(y_true=y_train, y_pred=result)
+acc.acc_report()
+
+cut_sc = 10000
+X_train_sc = autoencoder(X_train[:cut_sc], stop=True).detach().numpy()
+cut_sc1 = 5000 
+cut_sc2 = 10000
+cut_sc3 = 15000
+cut_sc4 = 20000
+X_train_sc1 = autoencoder(X_train[:cut_sc1], stop=True).detach().numpy()
+X_train_sc2 = autoencoder(X_train[cut_sc1:cut_sc2], stop=True).detach().numpy()
+X_train_sc3 = autoencoder(X_train[cut_sc2:cut_sc3], stop=True).detach().numpy()
+X_train_sc4 = autoencoder(X_train[cut_sc3:cut_sc4], stop=True).detach().numpy()
+
+# spectral clustering: can run with 10000 data(>3hrs)
+print("\nspectral clustering")
+print("\nfit_predict() for 10000 data")
+time1 = round(time.time()*1000)
+SC_index = sc.fit_predict(X_train_sc)
+time2 = round(time.time()*1000)
+print(f"SC time spent: {time2 - time1} milliseconds")
+
+acc = Accuracy(y_true=y_train[:cut_sc], y_pred=SC_index)
+acc.acc_report()
+
+# PSC + sc
+psc = PSC(model=model, clustering_method=sc, test_splitting_rate=0.7)
+print("\nPSC + sc")
+print("\nfit_predict() for 5000 data")
+time1 = round(time.time()*1000)
+PSC_index_1 = psc.fit_predict(X_train_sc1)
+time2 = round(time.time()*1000)
+print(f"PSC time spent: {time2 - time1} milliseconds")
+
+acc = Accuracy(y_true=y_train[:cut_sc1], y_pred=PSC_index_1)
+acc.acc_report()
+
+print("5000~10000")
+print("\npredict() for 5000 data")
+time1 = round(time.time()*1000)
+PSC_index_2 = psc.predict(X_train_sc2)
+time2 = round(time.time()*1000)
+print(f"PSC time spent: {time2 - time1} milliseconds")
+
+acc = Accuracy(y_true=y_train[cut_sc1:cut_sc2], y_pred=PSC_index_2)
+acc.acc_report()
+
+print("10000~15000")
+print("\npredict() for 5000 data")
+time1 = round(time.time()*1000)
+PSC_index_3 = psc.predict(X_train_sc3)
+time2 = round(time.time()*1000)
+print(f"PSC time spent: {time2 - time1} milliseconds")
+
+acc = Accuracy(y_true=y_train[cut_sc2:cut_sc3], y_pred=PSC_index_3)
+acc.acc_report()
+
+print("15000~20000")
+print("\npredict() for 5000 data")
+time1 = round(time.time()*1000)
+PSC_index_4 = psc.predict(X_train_sc4)
+time2 = round(time.time()*1000)
+print(f"PSC time spent: {time2 - time1} milliseconds")
+
+acc = Accuracy(y_true=y_train[cut_sc3:cut_sc4], y_pred=PSC_index_4)
+acc.acc_report()
+
+print("\naccuracy rate for 20000 data")
+result = np.concatenate((PSC_index_1, PSC_index_2, PSC_index_3, PSC_index_4), axis=0)
+acc = Accuracy(y_true=y_train[:cut_sc4], y_pred=result)
 acc.acc_report()
