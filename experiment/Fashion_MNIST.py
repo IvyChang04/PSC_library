@@ -92,7 +92,7 @@ train_loader = DataLoader(train_data, batch_size=24, shuffle=True)
 test_loader = DataLoader(test_data, batch_size=24, shuffle=True)
 
 autoencoder = Autoencoder()
-autoencoder = torch.load("autoencoder.pth")
+autoencoder = torch.load("experiment\autoencoder.pth")
 
 train_num = 60000
 cut_1 = 30000
