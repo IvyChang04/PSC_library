@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.cluster import KMeans
+from sklearn.manifold import SpectralEmbedding
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score
 import random
@@ -187,6 +188,10 @@ class PSC:
         The clustering method used to cluster the embedding.
     spliting_rate : float, default=0.3
         The spliting rate of the training data.
+    batch_size_data : int, default=50
+        The batch size of the training data.
+    batch_size_dataloader : int, default=20
+        The batch size of the dataloader.    
     
     Attributes
     ----------
@@ -212,6 +217,10 @@ class PSC:
         Whether the model has been fitted.
     dataloader : torch.utils.data.DataLoader
         The dataloader used to train the model.
+    batch_size_data : int
+        The batch size of the training data.
+    batch_size_dataloader : int
+        The batch size of the dataloader.
 
     Examples
     --------
@@ -222,9 +231,8 @@ class PSC:
     >>> X = digits.data/16
     >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
     >>> model = Four_layer_FNN(64, 128, 256, 64, 10)
-    >>> psc = PSC(model=model, clustering_method=cluster_method)
+    >>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, batch_size_data=1)
     >>> psc.fit(X)
-    Start training
     >>> psc.save_model("model")
     >>> cluster_idx = psc.predict(X)
 
@@ -248,7 +256,9 @@ class PSC:
         criterion = nn.MSELoss(),
         epochs = 50,
         clustering_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan'),
-        test_splitting_rate = 0.3
+        test_splitting_rate = 0.3,
+        batch_size_data = 50,
+        batch_size_dataloader = 20
         ) -> None:
 
         self.n_neighbor = n_neighbor
@@ -263,7 +273,9 @@ class PSC:
         self.clustering = clustering_method
         self.model_fitted = False
 
-    # input 轉換成做kmeans之前的matrix
+        self.batch_size_data = batch_size_data
+        self.batch_size_dataloader = batch_size_dataloader
+
     def __matrix_before_psc(self, X):
         dist  = cdist(X, X, "euclidean")
         S = np.zeros(dist.shape)
@@ -298,16 +310,17 @@ class PSC:
 
     def __train_model(self, X, x):
         self.model_fitted = True
-        print("Start training")
-        u = torch.from_numpy(self.__matrix_before_psc(X)).type(torch.FloatTensor)
+        spectral_embedding = SpectralEmbedding(n_components=self.n_neighbor, affinity='nearest_neighbors', n_neighbors=self.n_neighbor, eigen_solver='arpack')
+        u = torch.from_numpy(spectral_embedding.fit_transform(X)).type(torch.FloatTensor)
         dataset = torch.utils.data.TensorDataset(x, u)
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size = 50, shuffle = True)
+        dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size_dataloader, shuffle=True)
         self.dataloader = dataloader
-
-        for _ in range(self.epochs):
+        total_loss = 0
+        for i in range(self.epochs):
             loss = self.__loss_calculation()
-            if(loss < 0.00015):
-                break
+            total_loss += loss
+        print(total_loss/self.epochs)
+        return total_loss/self.epochs
 
     def __check_file_exist(self, file_name) -> bool:
         for entry in os.listdir('./'):
@@ -346,6 +359,11 @@ class PSC:
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
+        if self.test_splitting_rate == 1:
+            raise AttributeError(
+                f"'test_spliting_rate' should be less than 1 and not less than 0."
+            )
+
         if self.test_splitting_rate == 0:
             X_train, x_train = X, x
         
@@ -353,7 +371,20 @@ class PSC:
             X_train, _, x_train, _ = train_test_split(
                 X, x, test_size=self.test_splitting_rate, random_state=random.randint(1, 100))
 
-        self.__train_model(X_train, x_train)
+        batch_size = self.batch_size_data
+        total_loss = 0
+        i = 1
+        # Train the model in mini-batches
+        for start_idx in range(0, len(X_train), batch_size):
+            end_idx = start_idx + batch_size
+            X_batch = X_train[start_idx:end_idx]
+            x_batch = x_train[start_idx:end_idx]
+            loss = self.__train_model(X_batch, x_batch)
+            total_loss += loss
+            if i % 20 == 0:
+                print(f"Loss in {i-20} to {i}: {total_loss/20}")
+                total_loss = 0
+            i += 1
 
         U = self.model(x).detach().numpy()
 
