@@ -96,7 +96,7 @@ class Accuracy:
     
     Examples
     --------
-    >>> from ParametricSpectralClustering import import Accuracy
+    >>> from ParametricSpectralClustering import Accuracy
     >>> from sklearn.datasets import load_digits
     >>> from sklearn.cluster import KMeans
     >>> digits = load_digits()
@@ -224,19 +224,19 @@ class PSC:
 
     Examples
     --------
-    >>> from PSC_lib import PSC, Four_layer_FNN
+    >>> from ParametricSpectralClustering import PSC, Four_layer_FNN
     >>> from sklearn.datasets import load_digits
     >>> from sklearn.cluster import KMeans
     >>> digits = load_digits()
     >>> X = digits.data/16
     >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
     >>> model = Four_layer_FNN(64, 128, 256, 64, 10)
-    >>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, batch_size_data=1)
+    >>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, test_splitting_rate=0, batch_size_data=1797)
     >>> psc.fit(X)
     >>> psc.save_model("model")
     >>> cluster_idx = psc.predict(X)
 
-    >>> from PSC_lib import PSC, Four_layer_FNN
+    >>> from ParametricSpectralClustering import PSC, Four_layer_FNN
     >>> from sklearn.datasets import load_digits
     >>> from sklearn.cluster import KMeans
     >>> digits = load_digits()
