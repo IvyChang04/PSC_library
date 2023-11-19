@@ -319,7 +319,6 @@ class PSC:
         for i in range(self.epochs):
             loss = self.__loss_calculation()
             total_loss += loss
-        print(total_loss/self.epochs)
         return total_loss/self.epochs
 
     def __check_file_exist(self, file_name) -> bool:
