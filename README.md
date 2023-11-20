@@ -58,7 +58,7 @@ The ``[train_data]`` can accept .txt, .csv, and .npy format of data.
 
 The ``[n_cluster]`` is the number of clusters to form as well as the number of centroids to generate.
 
-The ``[test_splitting_rate]`` should be in float, between 0.0 and 1.0 and represent the proportion of the dataset to include in the train split.
+The ``[test_splitting_rate]`` should be in float, between 0.0 and 1.0. It represent the proportion of the input data reserved for testing the neural networks, and the remaining data will be used in training.
 
 <!-- LICENSE -->
 ## License

@@ -215,7 +215,7 @@ class PSC:
     clustering_method : sklearn.cluster, default=None
         The clustering method used to cluster the embedding.
     spliting_rate : float, default=0.3
-        The spliting rate of the training data.
+        The spliting rate of the testing data.
     batch_size_data : int, default=50
         The batch size of the training data.
     batch_size_dataloader : int, default=20
@@ -234,7 +234,7 @@ class PSC:
     criterion : torch.nn.modules.loss
         The loss function used to train the model.
     test_splitting_rate : float
-        The spliting rate of the training data.
+        The spliting rate of the testing data.
     optimizer : torch.optim
         The optimizer used to train the model.
     epochs : int
@@ -374,19 +374,19 @@ class PSC:
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
-        if self.test_splitting_rate == 0:
+        if self.test_splitting_rate >= 1 or self.test_splitting_rate < 0:
             raise AttributeError(
-                f"'test_spliting_rate' should be more than 0 and not more than 1."
+                f"'test_spliting_rate' should be not less than 0 and less than 1."
             )
 
-        if self.test_splitting_rate == 1:
+        if self.test_splitting_rate == 0:
             X_train, x_train = X, x
 
         else:
             X_train, _, x_train, _ = train_test_split(
                 X,
                 x,
-                train_size=self.test_splitting_rate,
+                test_size=self.test_splitting_rate,
                 random_state=random.randint(1, 100),
             )
 

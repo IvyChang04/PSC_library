@@ -12,7 +12,7 @@ parser.add_argument(
     "--test_splitting_rate",
     type=float,
     default=0.3,
-    help="The splitting rate of the training data",
+    help="The splitting rate of the testing data",
 )
 parser.add_argument(
     "-n_cluster", "--n_cluster", type=int, default=10, help="Number of clusters"
