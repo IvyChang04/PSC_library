@@ -5,7 +5,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.cluster import KMeans
-from sklearn.manifold import SpectralEmbedding
+from sklearn.manifold import spectral_embedding
+from sklearn.neighbors import kneighbors_graph
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score
 import random
@@ -249,6 +250,10 @@ class PSC:
         The batch size of the training data.
     batch_size_dataloader : int
         The batch size of the dataloader.
+    n_components : int
+        The number of embedding dimensions.
+    random : int
+        The random state.
 
     Examples
     --------
@@ -290,6 +295,8 @@ class PSC:
         test_splitting_rate=0.3,
         batch_size_data=50,
         batch_size_dataloader=20,
+        n_components=0,
+        random_state=0,
     ) -> None:
         self.n_neighbor = n_neighbor
         self.sigma = sigma
@@ -298,6 +305,8 @@ class PSC:
         self.criterion = criterion
         self.test_splitting_rate = test_splitting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        self.n_components = n_components
+        self.random = random_state
 
         self.epochs = epochs
         self.clustering = clustering_method
@@ -321,15 +330,19 @@ class PSC:
 
     def __train_model(self, X, x):
         self.model_fitted = True
-        spectral_embedding = SpectralEmbedding(
-            n_components=self.n_neighbor,
-            affinity="nearest_neighbors",
-            n_neighbors=self.n_neighbor,
+        connectivity = kneighbors_graph(
+            X, n_neighbors=self.n_neighbor, include_self=False
+        )
+        affinity_matrix_ = 0.5 * (connectivity + connectivity.T)
+        embedding = spectral_embedding(
+            affinity_matrix_,
+            n_components=self.n_components,
             eigen_solver="arpack",
+            random_state=1,
+            eigen_tol="auto",
+            drop_first=False,
         )
-        u = torch.from_numpy(spectral_embedding.fit_transform(X)).type(
-            torch.FloatTensor
-        )
+        u = torch.from_numpy(embedding).type(torch.FloatTensor)
         dataset = torch.utils.data.TensorDataset(x, u)
         dataloader = torch.utils.data.DataLoader(
             dataset, batch_size=self.batch_size_dataloader, shuffle=True
