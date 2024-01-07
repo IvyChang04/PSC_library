@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import cdist
 from scipy.optimize import linear_sum_assignment
 import torch
 import torch.nn as nn
@@ -225,7 +226,9 @@ class PSC:
     ----------
     n_neighbor : int
         Number of neighbors to use when constructing the adjacency matrix using k-nearest neighbors.
-    n_clusters : int
+    sigma : float
+        The sigma value for the Gaussian kernel.
+    k : int
         Number of clusters.
     model : torch.nn.Module
         The model used to learn the embedding.
@@ -247,6 +250,10 @@ class PSC:
         The batch size of the training data.
     batch_size_dataloader : int
         The batch size of the dataloader.
+    n_components : int
+        The number of embedding dimensions.
+    random : int
+        The random state.
 
     Examples
     --------
@@ -277,26 +284,30 @@ class PSC:
     def __init__(
         self,
         n_neighbor=8,
-        n_clusters=10,
+        sigma=1,
+        k=10,
         model=Four_layer_FNN(64, 128, 256, 64, 10),
         criterion=nn.MSELoss(),
         epochs=50,
+        clustering_method=KMeans(
+            n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
+        ),
         test_splitting_rate=0.3,
         batch_size_data=50,
         batch_size_dataloader=20,
-        clustering_method = None,
-        n_components = 0,
-        random_state = None,
+        n_components=0,
+        random_state=None,
     ) -> None:
         self.n_neighbor = n_neighbor
-        self.n_clusters = n_clusters
+        self.sigma = sigma
+        self.k = k
         self.model = model
         self.criterion = criterion
         self.test_splitting_rate = test_splitting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
         if n_components == 0:
-            self.n_components = self.clustering_method.n_clusters
+            self.n_components = self.clustering.n_clusters
         else:
             self.n_components = n_components
         
@@ -305,14 +316,8 @@ class PSC:
         else:
             self.random_state = random_state
 
-        if clustering_method is None:
-            self.clustering_method = KMeans(
-                n_clusters=self.n_clusters, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
-            )
-        else:
-            self.clustering_method = clustering_method
-
         self.epochs = epochs
+        self.clustering = clustering_method
         self.model_fitted = False
 
         self.batch_size_data = batch_size_data
@@ -334,26 +339,25 @@ class PSC:
     def __train_model(self, X, x):
         self.model_fitted = True
         connectivity = kneighbors_graph(
-            X, n_neighbors=self.n_neighbor, include_self=False)
+            X, n_neighbors=self.n_neighbor, include_self=False
+        )
         affinity_matrix_ = 0.5 * (connectivity + connectivity.T)
         embedding = spectral_embedding(
             affinity_matrix_,
             n_components=self.n_components,
-            eigen_solver='arpack',
-            random_state=1, # do we have to set random_state?
-            eigen_tol='auto',
-            drop_first=False
+            eigen_solver="arpack",
+            random_state=1,
+            eigen_tol="auto",
+            drop_first=False,
         )
-        u = torch.from_numpy(embedding).type(
-            torch.FloatTensor
-        )
+        u = torch.from_numpy(embedding).type(torch.FloatTensor)
         dataset = torch.utils.data.TensorDataset(x, u)
         dataloader = torch.utils.data.DataLoader(
             dataset, batch_size=self.batch_size_dataloader, shuffle=True
         )
         self.dataloader = dataloader
         total_loss = 0
-        for _ in range(self.epochs):
+        for i in range(self.epochs):
             loss = self.__loss_calculation()
             total_loss += loss
         return total_loss / self.epochs
@@ -365,7 +369,7 @@ class PSC:
         return False
 
     def __check_clustering_method(self) -> None:
-        if self.clustering_method is None:
+        if self.clustering is None:
             raise ValueError("No clustering method assigned.")
 
     def __check_model(self) -> None:
@@ -422,9 +426,9 @@ class PSC:
                 total_loss = 0
             i += 1
 
-        emb = self.model(x).detach().numpy()
+        U = self.model(x).detach().numpy()
 
-        return emb
+        return U
 
     def fit(self, X):
         """Fit the model according to the given training data.
@@ -439,14 +443,14 @@ class PSC:
         self : object
             Returns the instance itself.
         """
-        emb = self.training_psc_model(X)
+        U = self.training_psc_model(X)
 
-        if hasattr(self.clustering_method, "fit") is False:
+        if hasattr(self.clustering, "fit") is False:
             raise AttributeError(
-                f"'{type(self.clustering_method)}' object has no attribute 'fit'"
+                f"'{type(self.clustering)}' object has no attribute 'fit'"
             )
 
-        self.clustering_method.fit(emb)
+        self.clustering.fit(U)
 
         return self
 
@@ -463,14 +467,14 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        emb = self.training_psc_model(X)
+        U = self.training_psc_model(X)
 
-        if hasattr(self.clustering_method, "fit_predict") is False:
+        if hasattr(self.clustering, "fit_predict") is False:
             raise AttributeError(
-                f"'{type(self.clustering_method)}' object has no attribute 'fit_predict'"
+                f"'{type(self.clustering)}' object has no attribute 'fit_predict'"
             )
 
-        return self.clustering_method.fit_predict(emb)
+        return self.clustering.fit_predict(U)
 
     # predict the closest cluster
     def predict(self, X):
@@ -488,16 +492,16 @@ class PSC:
         """
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
-        emb = self.model(x).detach().numpy()
-        if hasattr(self.clustering_method, "predict") is False:
+        U = self.model(x).detach().numpy()
+        if hasattr(self.clustering, "predict") is False:
             raise AttributeError(
-                f"'{type(self.clustering_method)}' object has no attribute 'predict'"
+                f"'{type(self.clustering)}' object has no attribute 'predict'"
             )
 
         if self.model_fitted is False:
-            return self.clustering_method.fit_predict(emb)
+            return self.clustering.fit_predict(U)
 
-        return self.clustering_method.predict(emb)
+        return self.clustering.predict(U)
 
     def set_model(self, self_defined_model) -> None:
         """Set the model to a self-defined model.
