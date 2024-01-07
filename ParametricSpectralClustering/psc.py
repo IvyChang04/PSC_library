@@ -296,7 +296,7 @@ class PSC:
         batch_size_data=50,
         batch_size_dataloader=20,
         n_components=0,
-        random_state=0,
+        random_state=None,
     ) -> None:
         self.n_neighbor = n_neighbor
         self.sigma = sigma
@@ -305,8 +305,16 @@ class PSC:
         self.criterion = criterion
         self.test_splitting_rate = test_splitting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-        self.n_components = n_components
-        self.random = random_state
+
+        if n_components == 0:
+            self.n_components = self.clustering.n_clusters
+        else:
+            self.n_components = n_components
+        
+        if random_state is None:
+            self.random_state = random.randint(1, 100)
+        else:
+            self.random_state = random_state
 
         self.epochs = epochs
         self.clustering = clustering_method

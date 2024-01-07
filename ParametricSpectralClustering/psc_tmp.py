@@ -279,14 +279,11 @@ class PSC:
     def __init__(
         self,
         n_neighbor=8,
-        sigma=1,
-        k=10,
+        # sigma=1,
+        n_clusters=10,
         model=Four_layer_FNN(64, 128, 256, 64, 10),
         criterion=nn.MSELoss(),
         epochs=50,
-        clustering_method=KMeans(
-            n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
-        ),
         test_splitting_rate=0.3,
         batch_size_data=50,
         batch_size_dataloader=20,
@@ -294,15 +291,15 @@ class PSC:
         random_state = None,
     ) -> None:
         self.n_neighbor = n_neighbor
-        self.sigma = sigma
-        self.k = k
+        # self.sigma = sigma
+        self.n_clusters = n_clusters
         self.model = model
         self.criterion = criterion
         self.test_splitting_rate = test_splitting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
         if n_components == 0:
-            self.n_components = self.clustering.n_clusters
+            self.n_components = self.clustering_method.n_clusters
         else:
             self.n_components = n_components
         
@@ -312,7 +309,9 @@ class PSC:
             self.random_state = random_state
 
         self.epochs = epochs
-        self.clustering = clustering_method
+        self.clustering_method = KMeans(
+            n_clusters=self.n_clusters, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
+        )
         self.model_fitted = False
 
         self.batch_size_data = batch_size_data
@@ -353,7 +352,7 @@ class PSC:
         )
         self.dataloader = dataloader
         total_loss = 0
-        for i in range(self.epochs):
+        for _ in range(self.epochs):
             loss = self.__loss_calculation()
             total_loss += loss
         return total_loss / self.epochs
@@ -365,7 +364,7 @@ class PSC:
         return False
 
     def __check_clustering_method(self) -> None:
-        if self.clustering is None:
+        if self.clustering_method is None:
             raise ValueError("No clustering method assigned.")
 
     def __check_model(self) -> None:
@@ -422,9 +421,9 @@ class PSC:
                 total_loss = 0
             i += 1
 
-        U = self.model(x).detach().numpy()
+        emb = self.model(x).detach().numpy()
 
-        return U
+        return emb
 
     def fit(self, X):
         """Fit the model according to the given training data.
@@ -439,14 +438,14 @@ class PSC:
         self : object
             Returns the instance itself.
         """
-        U = self.training_psc_model(X)
+        emb = self.training_psc_model(X)
 
-        if hasattr(self.clustering, "fit") is False:
+        if hasattr(self.clustering_method, "fit") is False:
             raise AttributeError(
-                f"'{type(self.clustering)}' object has no attribute 'fit'"
+                f"'{type(self.clustering_method)}' object has no attribute 'fit'"
             )
 
-        self.clustering.fit(U)
+        self.clustering_method.fit(emb)
 
         return self
 
@@ -463,14 +462,14 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        U = self.training_psc_model(X)
+        emb = self.training_psc_model(X)
 
-        if hasattr(self.clustering, "fit_predict") is False:
+        if hasattr(self.clustering_method, "fit_predict") is False:
             raise AttributeError(
-                f"'{type(self.clustering)}' object has no attribute 'fit_predict'"
+                f"'{type(self.clustering_method)}' object has no attribute 'fit_predict'"
             )
 
-        return self.clustering.fit_predict(U)
+        return self.clustering_method.fit_predict(emb)
 
     # predict the closest cluster
     def predict(self, X):
@@ -488,16 +487,16 @@ class PSC:
         """
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
-        U = self.model(x).detach().numpy()
-        if hasattr(self.clustering, "predict") is False:
+        emb = self.model(x).detach().numpy()
+        if hasattr(self.clustering_method, "predict") is False:
             raise AttributeError(
-                f"'{type(self.clustering)}' object has no attribute 'predict'"
+                f"'{type(self.clustering_method)}' object has no attribute 'predict'"
             )
 
         if self.model_fitted is False:
-            return self.clustering.fit_predict(U)
+            return self.clustering_method.fit_predict(emb)
 
-        return self.clustering.predict(U)
+        return self.clustering_method.predict(emb)
 
     def set_model(self, self_defined_model) -> None:
         """Set the model to a self-defined model.
