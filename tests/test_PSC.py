@@ -8,20 +8,21 @@ import random
 import pickle
 
 digits = load_digits()
-x = digits.data/16
+x = digits.data / 16
 y = digits.target
 torch.manual_seed(0)
 np.random.seed(0)
 random.seed(0)
-clust_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
+clust_method = KMeans(
+    n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
+)
 model = Four_layer_FNN(64, 128, 256, 64, 10)
 psc = PSC(model=model, clustering_method=clust_method, test_splitting_rate=0.3)
 cluster_idx = psc.fit_predict(x)
 
-class testPSC(unittest.TestCase):
-    
-    def test_init(self):
 
+class testPSC(unittest.TestCase):
+    def test_init(self):
         self.assertIs(type(psc.n_neighbor), int)
         self.assertIs(type(psc.sigma), int)
         self.assertIs(type(psc.k), int)
@@ -39,14 +40,14 @@ class testPSC(unittest.TestCase):
         self.assertEqual(psc.test_splitting_rate, 0.3)
         self.assertEqual(psc.epochs, 50)
         self.assertEqual(psc.clustering, clust_method)
-    
+
     # output shape of fit_predict and predict
     def test_output_shape(self):
         self.assertEqual(x.shape, (1797, 64))
         output = psc.fit_predict(x)
-        self.assertEqual(output.shape, (1797, ))
+        self.assertEqual(output.shape, (1797,))
         output = psc.predict(x)
-        self.assertEqual(output.shape, (1797, ))
+        self.assertEqual(output.shape, (1797,))
 
     # train model
     def test_training_psc_model(self):
@@ -61,16 +62,16 @@ class testPSC(unittest.TestCase):
     def test_save_model(self):
         psc.save_model("test_save_model")
         self.assertEqual(os.path.exists("test_save_model"), True)
-        
+
         psc.fit(x)
         psc.save_model("test_save_fit_model")
         self.assertEqual(os.path.exists("test_save_fit_model"), True)
 
         m1 = None
         m2 = None
-        with open("test_save_model", 'wb') as f1:
+        with open("test_save_model", "wb") as f1:
             pickle.dump(m1, f1)
-        with open("test_save_fit_model", 'wb') as f2:
+        with open("test_save_fit_model", "wb") as f2:
             pickle.dump(m2, f2)
         self.assertEqual(m1, m2)
 
@@ -80,5 +81,5 @@ class testPSC(unittest.TestCase):
         self.assertEqual(psc.model_fitted, True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

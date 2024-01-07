@@ -42,7 +42,7 @@ Using UCI ML hand-written digits datasets as an example.
 >>> X = digits.data/16
 >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
 >>> model = Net(64, 128, 256, 64, 10)
->>> psc = PSC(model=model, clustering_method=cluster_method)
+>>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, test_splitting_rate=0, batch_size_data=1797)
 >>> cluster_idx = psc.fit_predict(X)
 ```
 
@@ -51,14 +51,14 @@ Using UCI ML hand-written digits datasets as an example.
 After installation, you may run the following scripts directly.
 
 ```sh
-python PSC_lib.py [train_data] [n_cluster] [test_splitting_rate]
+python bin\run.py [train_data] [n_cluster] [test_splitting_rate]
 ```
 
 The ``[train_data]`` can accept .txt, .csv, and .npy format of data.
 
 The ``[n_cluster]`` is the number of clusters to form as well as the number of centroids to generate.
 
-The ``[test_splitting_rate]`` should be in float, between 0.0 and 1.0 and represent the proportion of the dataset to include in the test split.
+The ``[test_splitting_rate]`` should be in float, between 0.0 and 1.0. It represent the proportion of the input data reserved for testing the neural networks, and the remaining data will be used in training.
 
 <!-- LICENSE -->
 ## License
@@ -69,6 +69,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 ## Contact
 |Author|Ivy Chang|Hsin Ju Tai|
 |---|---|---|
-|E-mail|ivy900403@gmail.com|luludai020127@gmail.com|
+|E-mail|ivy900403@gmail.com|hsinjutai@gmail.com|
 
 Project Link: [TBA](https://github.com/your_username/repo_name)
