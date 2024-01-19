@@ -181,8 +181,8 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     psc = PSC(model=model, clustering_method=kmeans, test_splitting_rate=0, n_components=params['n_clusters'], n_neighbor=params['n_neighbors'], batch_size_data=10000)
 
     clustering_algorithms = (
-        ('KMeans', kmeans),
-        ('PSC with library', psc)
+        ('Custom k-means', kmeans),
+        ('PSC with custom k-means', psc)
     )
 
     for name, algorithm in clustering_algorithms:
@@ -211,7 +211,7 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
 
         plt.subplot(len(datasets), len(clustering_algorithms), plot_num)
         if i_dataset == 0:
-            plt.title(name, size=12)
+            plt.title(name, size=24)
 
         colors = np.array(list(islice(cycle(['#377eb8', '#ff7f00', '#4daf4a',
                                              '#f781bf', '#a65628', '#984ea3',
@@ -225,10 +225,13 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         plt.ylim(-2.5, 2.5)
         plt.xticks(())
         plt.yticks(())
-        plt.text(.99, .01, ('%.2fs' % (t1 - t0)).lstrip('0'),
-                 transform=plt.gca().transAxes, size=12,
-                 horizontalalignment='right')
+        # plt.text(.99, .01, ('%.2fs' % (t1 - t0)).lstrip('0'),
+        #          transform=plt.gca().transAxes, size=12,
+        #          horizontalalignment='right')
         plot_num += 1
 
+
+plt.savefig('Experiments/custom_clustering2.pdf', format='pdf')
 plt.show()
+
 

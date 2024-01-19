@@ -204,7 +204,7 @@ class PSC:
         Number of neighbors to use when constructing the adjacency matrix using k-nearest neighbors.
     sigma : float, default=1
         The sigma value for the Gaussian kernel.
-    k : int, default=10
+    n_clusters : int, default=10
         Number of clusters.
     model : torch.nn.Module
         The model used to learn the embedding.
@@ -214,6 +214,7 @@ class PSC:
         Number of epochs to train the model.
     clustering_method : sklearn.cluster, default=None
         The clustering method used to cluster the embedding.
+        It can be any clustering method with fit(), predict() and fit_predict()
     spliting_rate : float, default=0.3
         The spliting rate of the testing data.
     batch_size_data : int, default=50
@@ -237,7 +238,7 @@ class PSC:
         The optimizer used to train the model.
     epochs : int
         Number of epochs to train the model.
-    clustering : str
+    clustering_method : str
         The clustering method used to cluster the embedding.
     model_fitted : bool
         Whether the model has been fitted.
