@@ -306,18 +306,19 @@ class PSC:
         self.test_splitting_rate = test_splitting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
+        self.clustering = clustering_method
+
         if n_components == 0:
             self.n_components = self.clustering.n_clusters
         else:
             self.n_components = n_components
-        
+
         if random_state is None:
             self.random_state = random.randint(1, 100)
         else:
             self.random_state = random_state
 
         self.epochs = epochs
-        self.clustering = clustering_method
         self.model_fitted = False
 
         self.batch_size_data = batch_size_data
@@ -443,14 +444,9 @@ class PSC:
         self : object
             Returns the instance itself.
         """
-        U = self.training_psc_model(X)
 
-        if hasattr(self.clustering, "fit") is False:
-            raise AttributeError(
-                f"'{type(self.clustering)}' object has no attribute 'fit'"
-            )
-
-        self.clustering.fit(U)
+        # train model
+        self.training_psc_model(X)
 
         return self
 
@@ -467,14 +463,14 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        U = self.training_psc_model(X)
+        emb = self.training_psc_model(X)
 
         if hasattr(self.clustering, "fit_predict") is False:
             raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'fit_predict'"
             )
 
-        return self.clustering.fit_predict(U)
+        return self.clustering.fit_predict(emb)
 
     # predict the closest cluster
     def predict(self, X):
@@ -492,27 +488,30 @@ class PSC:
         """
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
-        U = self.model(x).detach().numpy()
+
+        # turn input data points into low-dim embedding
+        emb = self.model(x).detach().numpy()
+
         if hasattr(self.clustering, "predict") is False:
             raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'predict'"
             )
 
-        if self.model_fitted is False:
-            return self.clustering.fit_predict(U)
+        # if self.model_fitted is False:
+        #     return self.clustering.fit_predict(U)
 
-        return self.clustering.predict(U)
+        return self.clustering.fit_predict(emb)
 
-    def set_model(self, self_defined_model) -> None:
-        """Set the model to a self-defined model.
+    # def set_model(self, self_defined_model) -> None:
+    #     """Set the model to a self-defined model.
 
-        Parameters
-        ----------
-        self_defined_model : torch.nn.Module
-            The self-defined model.
-        """
+    #     Parameters
+    #     ----------
+    #     self_defined_model : torch.nn.Module
+    #         The self-defined model.
+    #     """
 
-        self.model = self_defined_model
+    #     self.model = self_defined_model
 
     def save_model(self, path: str) -> None:
         """Save the model to a file.

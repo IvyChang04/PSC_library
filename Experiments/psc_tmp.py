@@ -284,9 +284,9 @@ class PSC:
         test_splitting_rate=0.3,
         batch_size_data=50,
         batch_size_dataloader=20,
-        clustering_method = None,
-        n_components = 0,
-        random_state = None,
+        clustering_method=None,
+        n_components=0,
+        random_state=None,
     ) -> None:
         self.n_neighbor = n_neighbor
         self.n_clusters = n_clusters
@@ -295,22 +295,26 @@ class PSC:
         self.test_splitting_rate = test_splitting_rate
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
+        if clustering_method is None:
+            self.clustering_method = KMeans(
+                n_clusters=self.n_clusters,
+                init="k-means++",
+                n_init=1,
+                max_iter=100,
+                algorithm="elkan",
+            )
+        else:
+            self.clustering_method = clustering_method
+
         if n_components == 0:
             self.n_components = self.clustering_method.n_clusters
         else:
             self.n_components = n_components
-        
+
         if random_state is None:
             self.random_state = random.randint(1, 100)
         else:
             self.random_state = random_state
-
-        if clustering_method is None:
-            self.clustering_method = KMeans(
-                n_clusters=self.n_clusters, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
-            )
-        else:
-            self.clustering_method = clustering_method
 
         self.epochs = epochs
         self.model_fitted = False
@@ -334,19 +338,18 @@ class PSC:
     def __train_model(self, X, x):
         self.model_fitted = True
         connectivity = kneighbors_graph(
-            X, n_neighbors=self.n_neighbor, include_self=False)
+            X, n_neighbors=self.n_neighbor, include_self=False
+        )
         affinity_matrix_ = 0.5 * (connectivity + connectivity.T)
         embedding = spectral_embedding(
             affinity_matrix_,
             n_components=self.n_components,
-            eigen_solver='arpack',
-            random_state=1, # do we have to set random_state?
-            eigen_tol='auto',
-            drop_first=False
+            eigen_solver="arpack",
+            random_state=1,  # do we have to set random_state?
+            eigen_tol="auto",
+            drop_first=False,
         )
-        u = torch.from_numpy(embedding).type(
-            torch.FloatTensor
-        )
+        u = torch.from_numpy(embedding).type(torch.FloatTensor)
         dataset = torch.utils.data.TensorDataset(x, u)
         dataloader = torch.utils.data.DataLoader(
             dataset, batch_size=self.batch_size_dataloader, shuffle=True
