@@ -231,7 +231,7 @@ class PSC:
         The model used to learn the embedding.
     criterion : torch.nn.modules.loss
         The loss function used to train the model.
-    test_splitting_rate : float
+    sampling_rat : float
         The spliting rate of the testing data.
     optimizer : torch.optim
         The optimizer used to train the model.
@@ -257,7 +257,7 @@ class PSC:
     >>> X = digits.data/16
     >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
     >>> model = Four_layer_FNN(64, 128, 256, 64, 10)
-    >>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, test_splitting_rate=0, batch_size_data=1797)
+    >>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, sampling_rat=0, batch_size_data=1797)
     >>> psc.fit(X)
     >>> psc.save_model("model")
     >>> cluster_idx = psc.predict(X)
@@ -281,7 +281,7 @@ class PSC:
         model=Four_layer_FNN(64, 128, 256, 64, 10),
         criterion=nn.MSELoss(),
         epochs=50,
-        test_splitting_rate=0.3,
+        sampling_ratio=0.3,
         batch_size_data=50,
         batch_size_dataloader=20,
         clustering_method=None,
@@ -292,7 +292,7 @@ class PSC:
         self.n_clusters = n_clusters
         self.model = model
         self.criterion = criterion
-        self.test_splitting_rate = test_splitting_rate
+        self.sampling_ratio = sampling_ratio
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
         if clustering_method is None:
@@ -394,19 +394,19 @@ class PSC:
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
-        if self.test_splitting_rate >= 1 or self.test_splitting_rate < 0:
+        if self.sampling_ratio >= 1 or self.sampling_ratio < 0:
             raise AttributeError(
                 f"'test_spliting_rate' should be not less than 0 and less than 1."
             )
 
-        if self.test_splitting_rate == 0:
+        if self.sampling_ratio == 0:
             X_train, x_train = X, x
 
         else:
             X_train, _, x_train, _ = train_test_split(
                 X,
                 x,
-                test_size=self.test_splitting_rate,
+                test_size=self.sampling_ratio,
                 random_state=random.randint(1, 100),
             )
 

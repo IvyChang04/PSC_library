@@ -178,7 +178,7 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     model = Net(params['n_clusters'])
 
     kmeans = KMeans_Customed(n_clusters=params['n_clusters'])
-    psc = PSC(model=model, clustering_method=kmeans, test_splitting_rate=0, n_components=params['n_clusters'], n_neighbor=params['n_neighbors'], batch_size_data=10000)
+    psc = PSC(model=model, clustering_method=kmeans, sampling_ratio=0, n_components=params['n_clusters'], n_neighbor=params['n_neighbors'], batch_size_data=10000)
 
     clustering_algorithms = (
         ('Custom k-means', kmeans),
