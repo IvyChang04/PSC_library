@@ -234,7 +234,7 @@ class PSC:
         The model used to learn the embedding.
     criterion : torch.nn.modules.loss
         The loss function used to train the model.
-    test_splitting_rate : float
+    sampling_ratio : float
         The spliting rate of the testing data.
     optimizer : torch.optim
         The optimizer used to train the model.
@@ -264,7 +264,7 @@ class PSC:
     >>> X = digits.data/16
     >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
     >>> model = Four_layer_FNN(64, 128, 256, 64, 10)
-    >>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, test_splitting_rate=0, batch_size_data=1797)
+    >>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, sampling_ratio=0, batch_size_data=1797)
     >>> psc.fit(X)
     >>> psc.save_model("model")
     >>> cluster_idx = psc.predict(X)
@@ -284,29 +284,34 @@ class PSC:
     def __init__(
         self,
         n_neighbor=8,
-        sigma=1,
-        k=10,
+        n_clusters=10,
         model=Four_layer_FNN(64, 128, 256, 64, 10),
         criterion=nn.MSELoss(),
         epochs=50,
-        clustering_method=KMeans(
-            n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
-        ),
-        test_splitting_rate=0.3,
+        sampling_ratio=0.3,
         batch_size_data=50,
         batch_size_dataloader=20,
+        clustering_method=None,
         n_components=0,
         random_state=None,
     ) -> None:
         self.n_neighbor = n_neighbor
-        self.sigma = sigma
-        self.k = k
+        self.n_clusters = n_clusters
         self.model = model
         self.criterion = criterion
-        self.test_splitting_rate = test_splitting_rate
+        self.sampling_ratio = sampling_ratio
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-        self.clustering = clustering_method
+        if clustering_method is None:
+            self.clustering_method = KMeans(
+                n_clusters=self.n_clusters,
+                init="k-means++",
+                n_init=1,
+                max_iter=100,
+                algorithm="elkan",
+            )
+        else:
+            self.clustering = clustering_method
 
         if n_components == 0:
             self.n_components = self.clustering.n_clusters
@@ -358,7 +363,7 @@ class PSC:
         )
         self.dataloader = dataloader
         total_loss = 0
-        for i in range(self.epochs):
+        for _ in range(self.epochs):
             loss = self.__loss_calculation()
             total_loss += loss
         return total_loss / self.epochs
@@ -377,7 +382,7 @@ class PSC:
         if self.model is None:
             raise ValueError("No model assigned.")
 
-    def training_psc_model(self, X):
+    def fit_into_spectral_embedding(self, X):
         """Train the model and return the embedding.
 
         Parameters
@@ -396,19 +401,19 @@ class PSC:
 
         x = torch.from_numpy(X).type(torch.FloatTensor)
 
-        if self.test_splitting_rate >= 1 or self.test_splitting_rate < 0:
+        if self.sampling_ratio >= 1 or self.sampling_ratio < 0:
             raise AttributeError(
                 f"'test_spliting_rate' should be not less than 0 and less than 1."
             )
 
-        if self.test_splitting_rate == 0:
+        if self.sampling_ratio == 0:
             X_train, x_train = X, x
 
         else:
             X_train, _, x_train, _ = train_test_split(
                 X,
                 x,
-                test_size=self.test_splitting_rate,
+                test_size=self.sampling_ratio,
                 random_state=random.randint(1, 100),
             )
 
@@ -427,9 +432,9 @@ class PSC:
                 total_loss = 0
             i += 1
 
-        U = self.model(x).detach().numpy()
+        emb = self.model(x).detach().numpy()
 
-        return U
+        return emb
 
     def fit(self, X):
         """Fit the model according to the given training data.
@@ -446,7 +451,7 @@ class PSC:
         """
 
         # train model
-        self.training_psc_model(X)
+        self.fit_into_spectral_embedding(X)
 
         return self
 
@@ -463,7 +468,7 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        emb = self.training_psc_model(X)
+        emb = self.fit_into_spectral_embedding(X)
 
         if hasattr(self.clustering, "fit_predict") is False:
             raise AttributeError(
