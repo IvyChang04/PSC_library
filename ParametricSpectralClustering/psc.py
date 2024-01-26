@@ -526,7 +526,6 @@ class PSC:
         path : str
             The path of the file.
         """
-        torch.save(self.model.state_dict(), path)
 
         with open(path, "wb") as f:
             pickle.dump(self.model, f)

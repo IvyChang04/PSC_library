@@ -6,21 +6,24 @@ import torch
 import numpy as np
 import random
 
+
 def main():
     torch.manual_seed(0)
     np.random.seed(0)
     random.seed(0)
 
     digits = load_digits()
-    X = digits.data/16
+    X = digits.data / 16
     y = digits.target
-    clust_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
+    clust_method = KMeans(
+        n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
+    )
     model = Four_layer_FNN(64, 128, 256, 64, 10)
     psc = PSC(model=model, clustering_method=clust_method, test_splitting_rate=0.3)
-    
-    time1 = round(time.time()*1000)
+
+    time1 = round(time.time() * 1000)
     cluster_id = psc.fit_predict(X)
-    time2 = round(time.time()*1000)
+    time2 = round(time.time() * 1000)
     print(f"time spent: {time2 - time1} milliseconds")
     acc = Accuracy(y, cluster_id)
     acc.acc_report()
