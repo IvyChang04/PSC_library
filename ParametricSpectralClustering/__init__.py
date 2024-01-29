@@ -1,5 +1,1 @@
-from .psc import(
-    Four_layer_FNN,
-    Accuracy,
-    PSC
-)
+from .psc import Four_layer_FNN, Accuracy, PSC

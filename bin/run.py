@@ -25,8 +25,8 @@ parser.add_argument(
     help="The path that saves the trained model",
 )
 parser.add_argument(
-    "-saving_format",
-    "--result_saving_format",
+    "-cluster_result_format",
+    "--cluster_result_format",
     type=str,
     default="csv",
     help="Save the result in csv format or txt format",
@@ -49,7 +49,7 @@ def __check_args():
         )
     if args.n_cluster is not None and args.n_cluster <= 0:
         raise ValueError("n_cluster must be integer and greater than 0.")
-    if args.result_saving_format is not None and args.result_saving_format not in [
+    if args.cluster_result_format is not None and args.cluster_result_format not in [
         "csv",
         "txt",
     ]:
@@ -90,7 +90,7 @@ def main(argv):
     if args.model_path is not None:
         psc.save_model(args.model_path)
 
-    if args.result_saving_format == "csv":
+    if args.cluster_result_format == "csv":
         df = pd.DataFrame(cluster_idx)
         df.to_csv(
             args.train_data[:-4] + "_cluster_result.csv", index=False, header=False

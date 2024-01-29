@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import random
 import pickle
+import os
 
 digits = load_digits()
 x = digits.data / 16

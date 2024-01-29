@@ -10,6 +10,7 @@ import torch.nn as nn
 from sklearn import cluster, datasets
 from sklearn.preprocessing import StandardScaler
 
+
 class KMeans_Customed:
     def __init__(self, n_clusters, max_iters=100) -> None:
         self.n_clusters = n_clusters
@@ -54,7 +55,6 @@ class Net(nn.Module):
         self.relu = nn.ReLU()
 
     def forward(self, x):
-
         x = self.fc1(x)
         x = self.fc2(x)
         x = self.relu(x)
@@ -64,7 +64,6 @@ class Net(nn.Module):
         x = self.fc5(x)
         x = self.output_layer(x)
         return x
-
 
 
 n_samples = 10000
@@ -175,14 +174,21 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     # estimate bandwidth for mean shift
     bandwidth = cluster.estimate_bandwidth(X, quantile=params["quantile"])
 
-    model = Net(params['n_clusters'])
+    model = Net(params["n_clusters"])
 
-    kmeans = KMeans_Customed(n_clusters=params['n_clusters'])
-    psc = PSC(model=model, clustering_method=kmeans, sampling_ratio=0, n_components=params['n_clusters'], n_neighbor=params['n_neighbors'], batch_size_data=10000)
+    kmeans = KMeans_Customed(n_clusters=params["n_clusters"])
+    psc = PSC(
+        model=model,
+        clustering_method=kmeans,
+        sampling_ratio=0,
+        n_components=params["n_clusters"],
+        n_neighbor=params["n_neighbors"],
+        batch_size_data=10000,
+    )
 
     clustering_algorithms = (
-        ('Custom k-means', kmeans),
-        ('PSC with custom k-means', psc)
+        ("Custom k-means", kmeans),
+        ("PSC with custom k-means", psc),
     )
 
     for name, algorithm in clustering_algorithms:
@@ -192,19 +198,21 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         with warnings.catch_warnings():
             warnings.filterwarnings(
                 "ignore",
-                message="the number of connected components of the " +
-                "connectivity matrix is [0-9]{1,2}" +
-                " > 1. Completing it to avoid stopping the tree early.",
-                category=UserWarning)
+                message="the number of connected components of the "
+                + "connectivity matrix is [0-9]{1,2}"
+                + " > 1. Completing it to avoid stopping the tree early.",
+                category=UserWarning,
+            )
             warnings.filterwarnings(
                 "ignore",
-                message="Graph is not fully connected, spectral embedding" +
-                " may not work as expected.",
-                category=UserWarning)
+                message="Graph is not fully connected, spectral embedding"
+                + " may not work as expected.",
+                category=UserWarning,
+            )
             algorithm.fit(X)
 
         t1 = time.time()
-        if hasattr(algorithm, 'labels_'):
+        if hasattr(algorithm, "labels_"):
             y_pred = algorithm.labels_.astype(np.int32)
         else:
             y_pred = algorithm.predict(X)
@@ -213,10 +221,26 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         if i_dataset == 0:
             plt.title(name, size=24)
 
-        colors = np.array(list(islice(cycle(['#377eb8', '#ff7f00', '#4daf4a',
-                                             '#f781bf', '#a65628', '#984ea3',
-                                             '#999999', '#e41a1c', '#dede00']),
-                                      int(max(y_pred) + 1))))
+        colors = np.array(
+            list(
+                islice(
+                    cycle(
+                        [
+                            "#377eb8",
+                            "#ff7f00",
+                            "#4daf4a",
+                            "#f781bf",
+                            "#a65628",
+                            "#984ea3",
+                            "#999999",
+                            "#e41a1c",
+                            "#dede00",
+                        ]
+                    ),
+                    int(max(y_pred) + 1),
+                )
+            )
+        )
         # add black color for outliers (if any)
         colors = np.append(colors, ["#000000"])
         plt.scatter(X[:, 0], X[:, 1], s=10, color=colors[y_pred])
@@ -231,7 +255,5 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         plot_num += 1
 
 
-plt.savefig('Experiments/custom_clustering2.pdf', format='pdf')
+plt.savefig("Experiments/custom_clustering2.pdf", format="pdf")
 plt.show()
-
-
