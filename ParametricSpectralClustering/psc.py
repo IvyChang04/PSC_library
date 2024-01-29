@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.spatial.distance import cdist
 from scipy.optimize import linear_sum_assignment
 import torch
 import torch.nn as nn
@@ -203,9 +202,7 @@ class PSC:
     ----------
     n_neighbor : int, default=8
         Number of neighbors to use when constructing the adjacency matrix using k-nearest neighbors.
-    sigma : float, default=1
-        The sigma value for the Gaussian kernel.
-    k : int, default=10
+    n_clusters : int, default=10
         Number of clusters.
     model : torch.nn.Module
         The model used to learn the embedding.
@@ -226,9 +223,7 @@ class PSC:
     ----------
     n_neighbor : int
         Number of neighbors to use when constructing the adjacency matrix using k-nearest neighbors.
-    sigma : float
-        The sigma value for the Gaussian kernel.
-    k : int
+    n_clusters : int
         Number of clusters.
     model : torch.nn.Module
         The model used to learn the embedding.
@@ -252,7 +247,7 @@ class PSC:
         The batch size of the dataloader.
     n_components : int
         The number of embedding dimensions.
-    random : int
+    random_state : int
         The random state.
 
     Examples
@@ -382,8 +377,8 @@ class PSC:
         if self.model is None:
             raise ValueError("No model assigned.")
 
-    def fit_into_spectral_embedding(self, X):
-        """Train the model and return the embedding.
+    def fit(self, X):
+        """Train the model used for transforming original data into low-dim data.
 
         Parameters
         ----------
@@ -392,8 +387,7 @@ class PSC:
 
         Returns
         -------
-        U : array-like of shape
-            The embedding of the training data.
+        No return value
         """
 
         self.__check_clustering_method()
@@ -432,28 +426,6 @@ class PSC:
                 total_loss = 0
             i += 1
 
-        emb = self.model(x).detach().numpy()
-
-        return emb
-
-    def fit(self, X):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training data.
-
-        Returns
-        -------
-        self : object
-            Returns the instance itself.
-        """
-
-        # train model
-        self.fit_into_spectral_embedding(X)
-
-        return self
 
     def fit_predict(self, X):
         """Fit the model according to the given training data and predict the closest cluster each sample in X belongs to.
@@ -468,7 +440,7 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        emb = self.fit_into_spectral_embedding(X)
+        emb = self.fit(X)
 
         if hasattr(self.clustering, "fit_predict") is False:
             raise AttributeError(
@@ -477,7 +449,7 @@ class PSC:
 
         return self.clustering.fit_predict(emb)
 
-    # predict the closest cluster
+
     def predict(self, X):
         """Predict the closest cluster each sample in X belongs to.
 
@@ -502,21 +474,7 @@ class PSC:
                 f"'{type(self.clustering)}' object has no attribute 'predict'"
             )
 
-        # if self.model_fitted is False:
-        #     return self.clustering.fit_predict(U)
-
         return self.clustering.fit_predict(emb)
-
-    # def set_model(self, self_defined_model) -> None:
-    #     """Set the model to a self-defined model.
-
-    #     Parameters
-    #     ----------
-    #     self_defined_model : torch.nn.Module
-    #         The self-defined model.
-    #     """
-
-    #     self.model = self_defined_model
 
     def save_model(self, path: str) -> None:
         """Save the model to a file.
