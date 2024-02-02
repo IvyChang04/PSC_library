@@ -31,7 +31,7 @@ keywords = [
 
 setup(
     name="ParametricSpectralClustering",
-    version="0.0.21",
+    version="0.0.22",
     description="A library for users to use parametric spectral clustering",
     long_description=open("README.md").read() + "\n\n" + open("CHANGELOG.txt").read(),
     long_description_content_type="text/markdown",
