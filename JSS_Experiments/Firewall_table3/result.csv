@@ -1,0 +1,6 @@
+,Data size,Time,Time.1,Accuracy,Accuracy.1,Accuracy.2,Accuracy.3
+0,m,SC,PSC,SC,PSC[1:n],PSC[n+1:m],PSC[1:m]
+1,15000,,,,,,
+2,30000,,,,,,
+3,45000,,,,,,
+4,60000,,,,,,

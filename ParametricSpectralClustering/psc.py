@@ -426,7 +426,6 @@ class PSC:
                 total_loss = 0
             i += 1
 
-
     def fit_predict(self, X):
         """Fit the model according to the given training data and predict the closest cluster each sample in X belongs to.
 
@@ -440,15 +439,14 @@ class PSC:
         cluster_index : array-like of shape (n_samples,)
             Index of the cluster each sample belongs to.
         """
-        emb = self.fit(X)
+        self.fit(X)
 
         if hasattr(self.clustering, "fit_predict") is False:
             raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'fit_predict'"
             )
 
-        return self.clustering.fit_predict(emb)
-
+        return self.predict(X)
 
     def predict(self, X):
         """Predict the closest cluster each sample in X belongs to.
@@ -469,7 +467,7 @@ class PSC:
         # turn input data points into low-dim embedding
         emb = self.model(x).detach().numpy()
 
-        if hasattr(self.clustering, "predict") is False:
+        if hasattr(self.clustering, "fit_predict") is False:
             raise AttributeError(
                 f"'{type(self.clustering)}' object has no attribute 'predict'"
             )
