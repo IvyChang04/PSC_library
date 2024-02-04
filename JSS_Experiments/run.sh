@@ -36,5 +36,5 @@ do
 done
 
 # experiment for Figure 2
-python JSS_Experiments/Figure2/main.py
+python JSS_Experiments/Synthesis_dataset/main.py
 

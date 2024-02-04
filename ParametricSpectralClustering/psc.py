@@ -298,7 +298,7 @@ class PSC:
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
         if clustering_method is None:
-            self.clustering_method = KMeans(
+            self.clustering = KMeans(
                 n_clusters=self.n_clusters,
                 init="k-means++",
                 n_init=1,
