@@ -210,14 +210,18 @@ class PSC:
         The loss function used to train the model.
     epochs : int, default=50
         Number of epochs to train the model.
-    clustering_method : sklearn.cluster, default=None
-        The clustering method used to cluster the embedding.
-    spliting_rate : float, default=0.3
+    sampling_ratio : float, default=0.3
         The spliting rate of the testing data.
     batch_size_data : int, default=50
         The batch size of the training data.
     batch_size_dataloader : int, default=20
         The batch size of the dataloader.
+    clustering_method : sklearn.cluster, default=None
+        The clustering method used to cluster the embedding.
+    n_components : int, default=0
+        The number of embedding dimensions.
+    random_state : int, default=None
+        The random state.
 
     Attributes
     ----------
@@ -233,22 +237,23 @@ class PSC:
         The spliting rate of the testing data.
     optimizer : torch.optim
         The optimizer used to train the model.
-    epochs : int
-        Number of epochs to train the model.
     clustering : str
         The clustering method used to cluster the embedding.
-    model_fitted : bool
-        Whether the model has been fitted.
-    dataloader : torch.utils.data.DataLoader
-        The dataloader used to train the model.
-    batch_size_data : int
-        The batch size of the training data.
-    batch_size_dataloader : int
-        The batch size of the dataloader.
     n_components : int
         The number of embedding dimensions.
     random_state : int
         The random state.
+    epochs : int
+        Number of epochs to train the model.
+    model_fitted : bool
+        Whether the model has been fitted.
+    batch_size_data : int
+        The batch size of the training data.
+    batch_size_dataloader : int
+        The batch size of the dataloader.
+    dataloader : torch.utils.data.DataLoader
+        The dataloader used to train the model.
+    
 
     Examples
     --------
@@ -309,7 +314,7 @@ class PSC:
             self.clustering = clustering_method
 
         if n_components == 0:
-            self.n_components = self.clustering.n_clusters
+            self.n_components = self.n_clusters
         else:
             self.n_components = n_components
 
@@ -378,7 +383,7 @@ class PSC:
             raise ValueError("No model assigned.")
 
     def fit(self, X):
-        """Train the model used for transforming original data into low-dim data.
+        """Train a model to convert input features into spectral embeddings.
 
         Parameters
         ----------
@@ -427,7 +432,7 @@ class PSC:
             i += 1
 
     def fit_predict(self, X):
-        """Fit the model according to the given training data and predict the closest cluster each sample in X belongs to.
+        """Fit the model and predict the closest cluster each sample in X belongs to.
 
         Parameters
         ----------
