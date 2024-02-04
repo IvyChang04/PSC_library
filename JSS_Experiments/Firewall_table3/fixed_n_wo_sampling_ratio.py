@@ -46,7 +46,7 @@ x_tmp = df.drop(["Action"], axis=1).values
 
 f = open("JSS_Experiments/Firewall_table3/log.txt", "a+")
 now = str(datetime.datetime.now())
-f.write("======" + now + "======")
+f.write("======" + now + "======\n")
 
 if args.size == -1:
     f.write("input data size: all\n")

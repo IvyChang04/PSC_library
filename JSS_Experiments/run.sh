@@ -28,3 +28,9 @@ do
     python JSS_Experiments/table_5/firewall_n_eq_m.py --method sc psc --size ${size}
 done
 
+# experiment for table 6
+datasets=('Pendigits' 'Letter')
+for dataset in "${datasets[@]}"
+do
+    python JSS_Experiments/table_6/main.py --method sc psc kmeans --dataset ${dataset} --size -1
+done

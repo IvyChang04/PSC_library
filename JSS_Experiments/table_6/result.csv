@@ -1,0 +1,10 @@
+Method,,Letter,Pendigits
+KMeans,ClusterAcc,,
+KMeans,ARI,,
+KMeans,AMI,,
+SC,ClusterAcc,,
+SC,ARI,,
+SC,AMI,,
+PSC,ClusterAcc,,
+PSC,ARI,,
+PSC,AMI,,
