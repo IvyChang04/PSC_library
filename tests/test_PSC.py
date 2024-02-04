@@ -18,7 +18,12 @@ clust_method = KMeans(
     n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm="elkan"
 )
 model = Four_layer_FNN(64, 128, 256, 64, 10)
-psc = PSC(model=model, clustering_method=clust_method, sampling_ratio=0.3, batch_size_data=1797)
+psc = PSC(
+    model=model,
+    clustering_method=clust_method,
+    sampling_ratio=0.3,
+    batch_size_data=1797,
+)
 cluster_idx = psc.fit_predict(x)
 
 
@@ -45,8 +50,7 @@ class testPSC(unittest.TestCase):
         self.assertEqual(psc.epochs, 50)
         self.assertEqual(psc.sampling_ratio, 0.3)
         self.assertEqual(psc.batch_size_data, 1797)
-        self.assertEqual(psc.clustering, clust_method)  
-
+        self.assertEqual(psc.clustering, clust_method)
 
     # output shape of fit_predict and predict
     def test_output_shape(self):

@@ -25,17 +25,23 @@ null_clustering_method = NullClusteringMethod(x)
 
 class ErrorHandling(unittest.TestCase):
     def test_raise_fit_predict_AttributeError(self):
-        psc = PSC(model=model, clustering_method=null_clustering_method, batch_size_data=1797)
+        psc = PSC(
+            model=model, clustering_method=null_clustering_method, batch_size_data=1797
+        )
         with self.assertRaises(AttributeError):
             psc.fit_predict(x)
 
     def test_raise_predict_AttributeError(self):
-        psc = PSC(model=model, clustering_method=null_clustering_method, batch_size_data=1797)
+        psc = PSC(
+            model=model, clustering_method=null_clustering_method, batch_size_data=1797
+        )
         with self.assertRaises(AttributeError):
             psc.predict(x)
 
     def test_raise_load_model_FileNotFoundError(self):
-        psc = PSC(model=model, clustering_method=clustering_method, batch_size_data=1797)
+        psc = PSC(
+            model=model, clustering_method=clustering_method, batch_size_data=1797
+        )
         with self.assertRaises(FileNotFoundError):
             psc.load_model("omg")
 
