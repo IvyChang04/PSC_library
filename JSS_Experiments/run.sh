@@ -34,3 +34,7 @@ for dataset in "${datasets[@]}"
 do
     python JSS_Experiments/table_6/main.py --method sc psc kmeans --dataset ${dataset} --size -1
 done
+
+# experiment for Figure 2
+python JSS_Experiments/Figure2/main.py
+
