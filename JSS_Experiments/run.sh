@@ -22,3 +22,9 @@ do
     python JSS_Experiments/Large_dataset/main.py --methods sc --size ${size}
 done
 
+# experiment for table 5
+for data in 15000, 30000, 45000, 60000
+do
+    python JSS_Experiments/table_5/firewall_n_eq_m.py --method sc psc --size ${size}
+done
+
