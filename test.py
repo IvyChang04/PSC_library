@@ -10,7 +10,7 @@ def main():
     y = digits.target
     clust_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
     model = Four_layer_FNN(64, 128, 256, 64, 10)
-    psc = PSC(model=model, clustering_method=clust_method, test_splitting_rate=0.3)
+    psc = PSC(model=model, clustering_method=clust_method, sampling_ratio=0.3, batch_size_data=1797)
     
     time1 = round(time.time()*1000)
     cluster_id = psc.fit_predict(X)

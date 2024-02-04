@@ -8,7 +8,7 @@ import io
 digits = load_digits()
 x = digits.data / 16
 y = digits.target
-psc = PSC()
+psc = PSC(batch_size_data=1797)
 cluster_idx = psc.fit_predict(x)
 acc = Accuracy(y_true=y, y_pred=cluster_idx)
 

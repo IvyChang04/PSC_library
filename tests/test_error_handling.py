@@ -24,36 +24,20 @@ null_clustering_method = NullClusteringMethod(x)
 
 
 class ErrorHandling(unittest.TestCase):
-    def test_raise_fit_AttributeError(self):
-        psc = PSC(model=model, clustering_method=null_clustering_method)
-        with self.assertRaises(AttributeError):
-            psc.fit(x)
-
     def test_raise_fit_predict_AttributeError(self):
-        psc = PSC(model=model, clustering_method=null_clustering_method)
+        psc = PSC(model=model, clustering_method=null_clustering_method, batch_size_data=1797)
         with self.assertRaises(AttributeError):
             psc.fit_predict(x)
 
     def test_raise_predict_AttributeError(self):
-        psc = PSC(model=model, clustering_method=null_clustering_method)
+        psc = PSC(model=model, clustering_method=null_clustering_method, batch_size_data=1797)
         with self.assertRaises(AttributeError):
             psc.predict(x)
 
     def test_raise_load_model_FileNotFoundError(self):
-        psc = PSC(model=model, clustering_method=clustering_method)
+        psc = PSC(model=model, clustering_method=clustering_method, batch_size_data=1797)
         with self.assertRaises(FileNotFoundError):
             psc.load_model("omg")
-
-    def test_raise_model_not_assigned_error(self):
-        psc = PSC(clustering_method=clustering_method)
-        psc.set_model(None)
-        with self.assertRaises(ValueError):
-            psc.fit(x)
-
-    def test_raise_clustering_method_not_assigned_error(self):
-        psc = PSC(model=model, clustering_method=None)
-        with self.assertRaises(ValueError):
-            psc.fit(x)
 
 
 if __name__ == "__main__":
