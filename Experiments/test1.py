@@ -1,4 +1,4 @@
-from psc_tmp import Four_layer_FNN, PSC, Accuracy
+from ParametricSpectralClustering import PSC
 import time
 import warnings
 from itertools import cycle, islice
@@ -11,7 +11,7 @@ from sklearn import cluster, datasets
 from sklearn.preprocessing import StandardScaler
 
 
-class KMeans_Customed:
+class KMedian:
     def __init__(self, n_clusters, max_iters=100) -> None:
         self.n_clusters = n_clusters
         self.max_iters = max_iters
@@ -25,11 +25,11 @@ class KMeans_Customed:
             # Assign each point to the nearest cluster
             labels = self.predict(X)
 
-            # Update cluster centers based on the mean of points in each cluster
+            # Update cluster centers based on the median of points in each cluster
             for i in range(self.n_clusters):
                 cluster_points = X[labels == i]
                 if len(cluster_points) > 0:
-                    self.cluster_centers_[i] = np.mean(cluster_points, axis=0)
+                    self.cluster_centers_[i] = np.median(cluster_points, axis=0)
 
     def predict(self, X):
         distances = np.linalg.norm(X[:, np.newaxis] - self.cluster_centers_, axis=2)
@@ -136,28 +136,6 @@ datasets = [
             "xi": 0.1,
         },
     ),
-    # (
-    #     varied,
-    #     {
-    #         "eps": 0.18,
-    #         "n_neighbors": 2,
-    #         "min_samples": 7,
-    #         "xi": 0.01,
-    #         "min_cluster_size": 0.2,
-    #     },
-    # ),
-    # (
-    #     aniso,
-    #     {
-    #         "eps": 0.15,
-    #         "n_neighbors": 2,
-    #         "min_samples": 7,
-    #         "xi": 0.1,
-    #         "min_cluster_size": 0.2,
-    #     },
-    # ),
-    # (blobs, {"min_samples": 7, "xi": 0.1, "min_cluster_size": 0.2}),
-    # (no_structure, {}),
 ]
 
 
@@ -176,10 +154,10 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
 
     model = Net(params["n_clusters"])
 
-    kmeans = KMeans_Customed(n_clusters=params["n_clusters"])
+    k_median = KMedian(n_clusters=params["n_clusters"])
     psc = PSC(
         model=model,
-        clustering_method=kmeans,
+        clustering_method=k_median,
         sampling_ratio=0,
         n_components=params["n_clusters"],
         n_neighbor=params["n_neighbors"],
@@ -187,8 +165,8 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     )
 
     clustering_algorithms = (
-        ("Custom k-means", kmeans),
-        ("PSC with custom k-means", psc),
+        ("k-median", k_median),
+        ("PSC with k-median", psc),
     )
 
     for name, algorithm in clustering_algorithms:
@@ -249,11 +227,8 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         plt.ylim(-2.5, 2.5)
         plt.xticks(())
         plt.yticks(())
-        # plt.text(.99, .01, ('%.2fs' % (t1 - t0)).lstrip('0'),
-        #          transform=plt.gca().transAxes, size=12,
-        #          horizontalalignment='right')
         plot_num += 1
 
 
-plt.savefig("Experiments/custom_clustering2.pdf", format="pdf")
+plt.savefig("Experiments/figure2_KMedian.pdf", format="pdf")
 plt.show()

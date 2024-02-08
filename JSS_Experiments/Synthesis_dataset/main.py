@@ -25,7 +25,7 @@ class KMedian:
             # Assign each point to the nearest cluster
             labels = self.predict(X)
 
-            # Update cluster centers based on the mean of points in each cluster
+            # Update cluster centers based on the median of points in each cluster
             for i in range(self.n_clusters):
                 cluster_points = X[labels == i]
                 if len(cluster_points) > 0:
