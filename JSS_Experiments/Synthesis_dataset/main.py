@@ -67,7 +67,7 @@ class Net(nn.Module):
 
 
 n_samples = 10000
-seed = 30
+seed = 72
 noisy_circles = datasets.make_circles(
     n_samples=n_samples, factor=0.5, noise=0.05, random_state=seed
 )
