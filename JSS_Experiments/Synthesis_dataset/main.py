@@ -11,7 +11,7 @@ from sklearn import cluster, datasets
 from sklearn.preprocessing import StandardScaler
 
 
-class KMeans_Customed:
+class KMedian:
     def __init__(self, n_clusters, max_iters=100) -> None:
         self.n_clusters = n_clusters
         self.max_iters = max_iters
@@ -29,7 +29,7 @@ class KMeans_Customed:
             for i in range(self.n_clusters):
                 cluster_points = X[labels == i]
                 if len(cluster_points) > 0:
-                    self.cluster_centers_[i] = np.mean(cluster_points, axis=0)
+                    self.cluster_centers_[i] = np.median(cluster_points, axis=0)
 
     def predict(self, X):
         distances = np.linalg.norm(X[:, np.newaxis] - self.cluster_centers_, axis=2)
@@ -154,10 +154,10 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
 
     model = Net(params["n_clusters"])
 
-    kmeans = KMeans_Customed(n_clusters=params["n_clusters"])
+    k_median = KMedian(n_clusters=params["n_clusters"])
     psc = PSC(
         model=model,
-        clustering_method=kmeans,
+        clustering_method=k_median,
         sampling_ratio=0,
         n_components=params["n_clusters"],
         n_neighbor=params["n_neighbors"],
@@ -165,8 +165,8 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     )
 
     clustering_algorithms = (
-        ("Custom k-means", kmeans),
-        ("PSC with custom k-means", psc),
+        ("k-median", k_median),
+        ("PSC with k-median", psc),
     )
 
     for name, algorithm in clustering_algorithms:
@@ -232,6 +232,7 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
 
 
 plt.savefig(
-    "JSS_Experiments/Synthesis_dataset/Figure2_custom_clustering.pdf", format="pdf"
+    "JSS_Experiments/Synthesis_dataset/Figure2_custom_clustering_KMedian.pdf",
+    format="pdf",
 )
 plt.show()
