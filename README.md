@@ -35,15 +35,17 @@ pip install -i https://test.pypi.org/simple/ ParametricSpectralClustering==0.0.1
 Using UCI ML hand-written digits datasets as an example.
 
 ```sh
->>> from ParametricSpectralClustering import PSC, Net
+>>> from ParametricSpectralClustering import PSC, Four_layer_FNN
 >>> from sklearn.datasets import load_digits
 >>> from sklearn.cluster import KMeans
 >>> digits = load_digits()
 >>> X = digits.data/16
 >>> cluster_method = KMeans(n_clusters=10, init="k-means++", n_init=1, max_iter=100, algorithm='elkan')
->>> model = Net(64, 128, 256, 64, 10)
->>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, test_splitting_rate=0, batch_size_data=1797)
->>> cluster_idx = psc.fit_predict(X)
+>>> model = Four_layer_FNN(64, 128, 256, 64, 10)
+>>> psc = PSC(model=model, clustering_method=cluster_method, n_neighbor=10, sampling_ratio=0, batch_size_data=1797)
+>>> psc.fit(X)
+>>> psc.save_model("model")
+>>> cluster_idx = psc.predict(X)
 ```
 
 <!-- COMMEND LINE TOOL -->
@@ -51,14 +53,18 @@ Using UCI ML hand-written digits datasets as an example.
 After installation, you may run the following scripts directly.
 
 ```sh
-python bin\run.py [train_data] [n_cluster] [test_splitting_rate]
+python bin\run.py [data] [rate] [n_cluster] [model_path] [cluster_result_format]
 ```
 
-The ``[train_data]`` can accept .txt, .csv, and .npy format of data.
+The ``[data]`` can accept .txt, .csv, and .npy format of data.
+
+The ``[rate]`` should be in float, between 0.0 and 1.0. It represent the proportion of the input data reserved for testing the neural networks, and the remaining data will be used in training.
 
 The ``[n_cluster]`` is the number of clusters to form as well as the number of centroids to generate.
 
-The ``[test_splitting_rate]`` should be in float, between 0.0 and 1.0. It represent the proportion of the input data reserved for testing the neural networks, and the remaining data will be used in training.
+The ``[model_path]`` is the path to save the trained model.
+
+The ``[cluster_result_format]`` can be either .txt or .csv. It represent the format of the cluster result.
 
 <!-- LICENSE -->
 ## License
