@@ -253,7 +253,7 @@ class PSC:
         The batch size of the dataloader.
     dataloader : torch.utils.data.DataLoader
         The dataloader used to train the model.
-    
+
 
     Examples
     --------
@@ -302,6 +302,11 @@ class PSC:
         self.sampling_ratio = sampling_ratio
         self.optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
+        if random_state is None:
+            self.random_state = random.randint(1, 100)
+        else:
+            self.random_state = random_state
+
         if clustering_method is None:
             self.clustering = KMeans(
                 n_clusters=self.n_clusters,
@@ -309,6 +314,7 @@ class PSC:
                 n_init=1,
                 max_iter=100,
                 algorithm="elkan",
+                random_state=self.random_state,
             )
         else:
             self.clustering = clustering_method
@@ -317,11 +323,6 @@ class PSC:
             self.n_components = self.n_clusters
         else:
             self.n_components = n_components
-
-        if random_state is None:
-            self.random_state = random.randint(1, 100)
-        else:
-            self.random_state = random_state
 
         self.epochs = epochs
         self.model_fitted = False
@@ -358,6 +359,7 @@ class PSC:
         )
         u = torch.from_numpy(embedding).type(torch.FloatTensor)
         dataset = torch.utils.data.TensorDataset(x, u)
+        # not sure whether shuffle = True will affect the result
         dataloader = torch.utils.data.DataLoader(
             dataset, batch_size=self.batch_size_dataloader, shuffle=True
         )
@@ -413,7 +415,7 @@ class PSC:
                 X,
                 x,
                 test_size=self.sampling_ratio,
-                random_state=random.randint(1, 100),
+                random_state=self.random_state,
             )
 
         batch_size = self.batch_size_data
