@@ -239,7 +239,7 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
     psc = PSC(
         model=model,
         clustering_method=kmeans_psc,
-        test_splitting_rate=0,
+        sampling_ratio=0,
         n_components=params["n_clusters"],
         n_neighbor=params["n_neighbors"],
         batch_size_data=10000,
@@ -279,7 +279,7 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
             y_pred = algorithm.predict(X)
 
         if algo_name == "PSC":
-            path = "Synthesis/" + str(name) + ".pth"
+            path = "JSS_Experiments/Synthesis_dataset/" + str(name) + "2.pth"
             algorithm.save_model(path=path)
 
         plt.subplot(len(datasets), len(clustering_algorithms), plot_num)

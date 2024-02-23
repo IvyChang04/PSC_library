@@ -9,3 +9,5 @@ test.py
 digits.npy
 digits_cluster_result.*
 unittest_example.py
+*.pth
+lulu_result/
