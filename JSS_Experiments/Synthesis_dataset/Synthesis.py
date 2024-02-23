@@ -23,10 +23,12 @@ np.random.seed(0)
 # of the algorithms, but not too big to avoid too long running times
 # ============
 n_samples = 10000
-noisy_circles = datasets.make_circles(n_samples=n_samples, factor=0.5, noise=0.05)
+noisy_circles = datasets.make_circles(
+    n_samples=n_samples, factor=0.5, noise=0.05, random_state=rng
+)
 x, y = noisy_circles
 print(x.shape)
-noisy_moons = datasets.make_moons(n_samples=n_samples, noise=0.05)
+noisy_moons = datasets.make_moons(n_samples=n_samples, noise=0.05, random_state=rng)
 blobs = datasets.make_blobs(n_samples=n_samples, random_state=8)
 no_structure = np.random.rand(n_samples, 2), None
 
@@ -201,12 +203,17 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
     # Create cluster objects
     # ============
     KMeans = cluster.KMeans(
-        n_clusters=params["n_clusters"], init="random", n_init="auto", algorithm="elkan"
+        n_clusters=params["n_clusters"],
+        init="random",
+        n_init="auto",
+        algorithm="elkan",
+        random_state=rng,
     )
     spectral = cluster.SpectralClustering(
         n_clusters=params["n_clusters"],
         eigen_solver="arpack",
         affinity="nearest_neighbors",
+        random_state=rng,
     )
     torch.manual_seed(0)
     model_1 = Net1(params["n_clusters"])
