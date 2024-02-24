@@ -12,3 +12,4 @@ unittest_example.py
 *.pth
 lulu_result/
 *.pdf
+compare.py
