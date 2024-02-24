@@ -361,7 +361,7 @@ class PSC:
         dataset = torch.utils.data.TensorDataset(x, u)
         # not sure whether shuffle = True will affect the result
         dataloader = torch.utils.data.DataLoader(
-            dataset, batch_size=self.batch_size_dataloader, shuffle=True
+            dataset, batch_size=self.batch_size_dataloader, shuffle=False
         )
         self.dataloader = dataloader
         total_loss = 0

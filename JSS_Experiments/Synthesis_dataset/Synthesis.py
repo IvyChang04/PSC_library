@@ -10,7 +10,7 @@ from sklearn.neighbors import kneighbors_graph
 from sklearn.preprocessing import StandardScaler
 from itertools import cycle, islice
 
-from ParametricSpectralClustering import PSC
+from ParametricSpectralClustering.psc import PSC
 
 r = 72
 rng = np.random.RandomState(r)
