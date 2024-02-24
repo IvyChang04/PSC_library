@@ -153,7 +153,7 @@ for i in range(10):
         psc = PSC(
             model=model,
             clustering_method=kmeans,
-            sampling_ratio=args.rate,
+            sampling_ratio=args.ratio,
             n_components=10,
             n_neighbor=10,
             batch_size_data=args.size,

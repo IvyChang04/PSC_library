@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -ex
+set -ex
 
 # experiment for table 3
 for data in 15000, 30000, 45000, 60000
@@ -36,5 +36,12 @@ do
 done
 
 # experiment for Figure 2
-python JSS_Experiments/Synthesis_dataset/main.py
+python JSS_Experiments/Synthesis_dataset/figure2.py
 
+# experiment for Figure 1
+
+datasets=('noisy_circles' 'noisy_moons' 'varied' 'aniso' 'blobs' 'no_structure')
+for dataset in "${datasets[@]}"
+do
+    python JSS_Experiments/Synthesis_dataset/figure1.py --dataset ${dataset}
+done

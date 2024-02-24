@@ -5,12 +5,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch.nn as nn
 import random
+import argparse
 from sklearn import cluster, datasets, mixture
 from sklearn.neighbors import kneighbors_graph
 from sklearn.preprocessing import StandardScaler
 from itertools import cycle, islice
 
 from ParametricSpectralClustering.psc import PSC
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-dataset",
+    "--dataset",
+    type=str,
+    help="the dataset used in this single experiment",
+)
+args = parser.parse_args()
 
 r = 72
 rng = np.random.RandomState(r)
@@ -27,7 +37,6 @@ noisy_circles = datasets.make_circles(
     n_samples=n_samples, factor=0.5, noise=0.05, random_state=rng
 )
 x, y = noisy_circles
-print(x.shape)
 noisy_moons = datasets.make_moons(n_samples=n_samples, noise=0.05, random_state=rng)
 blobs = datasets.make_blobs(n_samples=n_samples, random_state=8)
 no_structure = np.random.rand(n_samples, 2), None
@@ -47,7 +56,7 @@ varied = datasets.make_blobs(
 # ============
 # Set up cluster parameters
 # ============
-plt.figure(figsize=(7.5, 7.5))
+plt.figure(figsize=(7.5, 3))
 plt.subplots_adjust(
     left=0.02, right=0.98, bottom=0.001, top=0.96, wspace=0.05, hspace=0.01
 )
@@ -109,6 +118,25 @@ datasets = [
     ("blobs", blobs, {}),
     ("no_structure", no_structure, {}),
 ]
+
+if args.dataset == "noisy_circles":
+    datasets = [datasets[0]]
+    fig_num = 1
+elif args.dataset == "noisy_moons":
+    datasets = [datasets[1]]
+    fig_num = 2
+elif args.dataset == "varied":
+    datasets = [datasets[2]]
+    fig_num = 3
+elif args.dataset == "aniso":
+    datasets = [datasets[3]]
+    fig_num = 4
+elif args.dataset == "blobs":
+    datasets = [datasets[4]]
+    fig_num = 5
+elif args.dataset == "no_structure":
+    datasets = [datasets[5]]
+    fig_num = 6
 
 
 # for noisy_circles, noisy_moons, blobs, no_structure
@@ -227,13 +255,10 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
 
     l = ["noisy_circles", "noisy_moons", "blobs", "no_structure"]
     if name in l:
-        print("net 1")
         model = model_1
     elif name == "varied":
-        print("net 2")
         model = model_2
     elif name == "aniso":
-        print("net 3")
         model = model_3
 
     psc = PSC(
@@ -278,10 +303,6 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
         else:
             y_pred = algorithm.predict(X)
 
-        if algo_name == "PSC":
-            path = "JSS_Experiments/Synthesis_dataset/" + str(name) + "2.pth"
-            algorithm.save_model(path=path)
-
         plt.subplot(len(datasets), len(clustering_algorithms), plot_num)
         if i_dataset == 0:
             plt.title(algo_name, size=10)
@@ -306,7 +327,6 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
                 )
             )
         )
-        # add black color for outliers (if any)
         colors = np.append(colors, ["#000000"])
         plt.scatter(X[:, 0], X[:, 1], s=10, color=colors[y_pred])
 
@@ -314,9 +334,6 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
         plt.ylim(-2.5, 2.5)
         plt.xticks(())
         plt.yticks(())
-        # plt.text(.99, .01, ('%.2fs' % (t1 - t0)).lstrip('0'),
-        #          transform=plt.gca().transAxes, size=12,
-        #          horizontalalignment='right')
         plot_num += 1
-plt.savefig("synthesis.pdf", format="pdf", bbox_inches="tight")
-plt.show()
+fig_name = "JSS_Experiments/Synthesis_dataset/Figure1-" + str(fig_num) + ".pdf"
+plt.savefig(fig_name, format="pdf", bbox_inches="tight")
