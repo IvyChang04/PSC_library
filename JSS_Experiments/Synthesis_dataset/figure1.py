@@ -209,6 +209,7 @@ class Net3(nn.Module):
 
 for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
     # update parameters with dataset-specific values
+    print(name)
     params = default_base.copy()
     params.update(algo_params)
 
@@ -256,10 +257,17 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
     l = ["noisy_circles", "noisy_moons", "blobs", "no_structure"]
     if name in l:
         model = model_1
+        print("1")
     elif name == "varied":
         model = model_2
+        print("2")
     elif name == "aniso":
         model = model_3
+        print("3")
+
+    # for name, param in model.named_parameters():
+    #     print(f"Parameter name: {name}, Shape: {param.shape}")
+    #     print(f"Parameter values:\n{param.data}\n")
 
     psc = PSC(
         model=model,
@@ -296,6 +304,10 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
                 category=UserWarning,
             )
             algorithm.fit(X)
+            if algo_name == "PSC":
+                for name, param in algorithm.model.named_parameters():
+                    print(f"Parameter name: {name}, Shape: {param.shape}")
+                    print(f"Parameter values:\n{param.data}\n")
 
         t1 = time.time()
         if hasattr(algorithm, "labels_"):
