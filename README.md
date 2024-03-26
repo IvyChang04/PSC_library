@@ -9,10 +9,11 @@ This repository provides a PyTorch implementation of the **Parametric Spectral C
 Parametric Spectral Clustering requires:
 
 * Python (>= 3.8)
-* PyTorch (>= 1.19.2)
-* Scikit-learn (>= 1.1.2)
-* SciPy (>= 1.7.3)
-* Pandas
+* NumPy (>= 1.24.3)
+* SciPy (>= 1.10.3)
+* PyTorch (>= 1.12.1)
+* scikit-learn (>= 1.3.2)
+* Pandas (>= 2.0.3)
 
 ---
 
@@ -26,7 +27,7 @@ python setup.py install
 
 Use pip:
 ```sh
-pip install -i https://test.pypi.org/simple/ ParametricSpectralClustering==0.0.14
+pip install -i [url] ParametricSpectralClustering==0.0.14
 ```
 
 <!-- SAMPLE USAGE -->
@@ -58,9 +59,9 @@ python bin\run.py [data] [rate] [n_cluster] [model_path] [cluster_result_format]
 
 The ``[data]`` can accept .txt, .csv, and .npy format of data.
 
-The ``[rate]`` should be in float, between 0.0 and 1.0. It represent the proportion of the input data reserved for testing the neural networks, and the remaining data will be used in training.
+The ``[rate]`` should be in float, between 0.0 and 1.0. It represent the proportion of the input data reserved for training the mapping function from the original feature space to the spectral embedding.
 
-The ``[n_cluster]`` is the number of clusters to form as well as the number of centroids to generate.
+The ``[n_cluster]`` is the number of clusters the user intends to partition. This number needs to be lower than the total data points available within the dataset.
 
 The ``[model_path]`` is the path to save the trained model.
 
