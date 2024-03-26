@@ -188,10 +188,6 @@ class Accuracy:
         clusterAcc = self.cluster_acc()
         ari = self.ARI()
         ami = self.AMI()
-
-        print(f"Clustering Accuracy: {clusterAcc}")
-        print(f"Adjusted rand index: {ari}")
-        print(f"Adjusted mutual information: {ami}")
         return clusterAcc, ari, ami
 
 
@@ -429,7 +425,6 @@ class PSC:
             loss = self.__train_model(X_batch, x_batch)
             total_loss += loss
             if i % 20 == 0:
-                print(f"Loss in {i-20} to {i}: {total_loss/20}")
                 total_loss = 0
             i += 1
 

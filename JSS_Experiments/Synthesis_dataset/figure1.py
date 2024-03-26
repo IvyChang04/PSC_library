@@ -22,6 +22,8 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+# f = open("y_pred.txt", "a+")
+
 r = 72
 rng = np.random.RandomState(r)
 torch.manual_seed(0)
@@ -209,7 +211,7 @@ class Net3(nn.Module):
 
 for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
     # update parameters with dataset-specific values
-    print(name)
+    # print(name)
     params = default_base.copy()
     params.update(algo_params)
 
@@ -257,13 +259,13 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
     l = ["noisy_circles", "noisy_moons", "blobs", "no_structure"]
     if name in l:
         model = model_1
-        print("1")
+        # print("1")
     elif name == "varied":
         model = model_2
-        print("2")
+        # print("2")
     elif name == "aniso":
         model = model_3
-        print("3")
+        # print("3")
 
     # for name, param in model.named_parameters():
     #     print(f"Parameter name: {name}, Shape: {param.shape}")
@@ -280,8 +282,8 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
     )
 
     clustering_algorithms = (
-        ("KMeans", KMeans),
-        ("SpectralClustering", spectral),
+        # ("KMeans", KMeans),
+        # ("SpectralClustering", spectral),
         ("PSC", psc),
     )
 
@@ -304,16 +306,29 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
                 category=UserWarning,
             )
             algorithm.fit(X)
-            if algo_name == "PSC":
-                for name, param in algorithm.model.named_parameters():
-                    print(f"Parameter name: {name}, Shape: {param.shape}")
-                    print(f"Parameter values:\n{param.data}\n")
+            # if algo_name == "PSC":
+            #     for name, param in algorithm.model.named_parameters():
+            #         print(f"Parameter name: {name}, Shape: {param.shape}")
+            #         print(f"Parameter values:\n{param.data}\n")
 
         t1 = time.time()
         if hasattr(algorithm, "labels_"):
             y_pred = algorithm.labels_.astype(np.int32)
         else:
             y_pred = algorithm.predict(X)
+
+        if args.dataset == "noisy_circles":
+            np.savetxt("y_pred_noisy_circles.txt", y_pred, fmt="%d", delimiter=",")
+        elif args.dataset == "noisy_moons":
+            np.savetxt("y_pred_noisy_moons.txt", y_pred, fmt="%d", delimiter=",")
+        elif args.dataset == "varied":
+            np.savetxt("y_pred_varied2.txt", y_pred, fmt="%d", delimiter=",")
+        elif args.dataset == "aniso":
+            np.savetxt("y_pred_aniso.txt", y_pred, fmt="%d", delimiter=",")
+        elif args.dataset == "blobs":
+            np.savetxt("y_pred_blobs.txt", y_pred, fmt="%d", delimiter=",")
+        elif args.dataset == "no_structure":
+            np.savetxt("y_pred_no_structure.txt", y_pred, fmt="%d", delimiter=",")
 
         plt.subplot(len(datasets), len(clustering_algorithms), plot_num)
         if i_dataset == 0:
@@ -349,3 +364,4 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
         plot_num += 1
 fig_name = "JSS_Experiments/Synthesis_dataset/Figure1-" + str(fig_num) + ".pdf"
 plt.savefig(fig_name, format="pdf", bbox_inches="tight")
+# f.close()
