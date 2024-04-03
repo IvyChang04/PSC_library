@@ -9,8 +9,6 @@ import argparse
 import warnings
 import numpy as np
 
-# python NIDS/exp.py --methods kmeans --size -1 --rate 0.9
-
 warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser()
@@ -69,7 +67,7 @@ print(df.drop(["Attack", "IPV4_SRC_ADDR", "IPV4_DST_ADDR", "Dataset"], axis=1).i
 y_tmp = df["Attack"].values
 x_tmp = df.drop(["Attack", "IPV4_SRC_ADDR", "IPV4_DST_ADDR", "Dataset"], axis=1).values
 
-f = open("JSS_Experiments/NIDS_table7/log.txt", "a+")
+f = open("JSS_Experiments/NIDS_table5/log.txt", "a+")
 now = str(datetime.datetime.now())
 f.write("======" + now + "======\n")
 if args.size == -1:
@@ -90,7 +88,7 @@ total_time = []
 total_ari = []
 total_ami = []
 
-result = pd.read_csv("JSS_Experiments/NIDS_table7/result.csv", index_col=0)
+result = pd.read_csv("JSS_Experiments/NIDS_table5/result.csv", index_col=0)
 
 for i in range(10):
     # --------Spectral Clustering--------
@@ -166,7 +164,7 @@ for i in range(10):
         end_time = round(time.time() * 1000)
 
         # save model
-        psc.save_model("NIDS/psc_model" + str(i + 1) + ".pkl")
+        psc.save_model("JSS_Experiments/NIDS_table5/psc_model" + str(i + 1) + ".pkl")
 
         # calculate acc, ari, ami
         acc = Accuracy(y_true=y, y_pred=psc_index)
@@ -221,4 +219,4 @@ if "sc" in methods:
     result.at[str(args), "SC.3"] = str(ami_mean) + "±" + str(ami_std)
 
 f.close()
-df.to_csv("JSS_Experiments/NIDS_table7/result.csv")
+df.to_csv("JSS_Experiments/NIDS_table5/result.csv")

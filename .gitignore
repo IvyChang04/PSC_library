@@ -13,7 +13,6 @@ unittest_example.py
 lulu_result/
 *.pdf
 compare.py
-*.txt
 psc.py
 Figure_1.py
 compare_txt.py

@@ -44,7 +44,7 @@ y_tmp = df["Action"].values
 x_tmp = df.drop(["Action"], axis=1).values
 
 
-f = open("JSS_Experiments/Firewall_table3/log.txt", "a+")
+f = open("JSS_Experiments/Firewall_table4/log.txt", "a+")
 now = str(datetime.datetime.now())
 f.write("======" + now + "======\n")
 
@@ -77,7 +77,7 @@ psc_time_1_30000 = []
 psc_time_1_45000 = []
 psc_time_1_60000 = []
 
-result = pd.read_csv("JSS_Experiments/Firewall_table3/result.csv")
+result = pd.read_csv("JSS_Experiments/Firewall_table4/result.csv")
 
 for _ in range(10):
     if "sc" in methods:
@@ -431,4 +431,4 @@ if "psc" in methods:
 
 
 f.close()
-result.to_csv("JSS_Experiments/Firewall_table3/result.csv", index=False)
+result.to_csv("JSS_Experiments/Firewall_table4/result.csv", index=False)

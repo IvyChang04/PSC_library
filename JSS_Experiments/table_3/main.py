@@ -93,7 +93,7 @@ elif "Letter" in dataset:
     scaler = sklearn.preprocessing.StandardScaler().fit(x_data_tmp)
     x_tmp = scaler.transform(x_data_tmp)
 
-f = open("JSS_Experiments/table_6/log.txt", "a+")
+f = open("JSS_Experiments/table_3/log.txt", "a+")
 now = str(datetime.datetime.now())
 f.write("======" + now + "======\n")
 f.write("dataset: " + str(args.dataset) + "\n")
@@ -124,7 +124,7 @@ psc_total_acc = []
 psc_total_ari = []
 psc_total_ami = []
 
-result = pd.read_csv("JSS_Experiments/table_6/result.csv", index_col=[0, 1])
+result = pd.read_csv("JSS_Experiments/table_3/result.csv", index_col=[0, 1])
 
 for _ in range(10):
     if "sc" in methods:
@@ -276,4 +276,4 @@ if "kmeans" in methods:
     result.at[("KMeans", "AMI"), args.dataset] = str(ami_mean) + "±" + str(ami_std)
 
 f.close()
-result.to_csv("JSS_Experiments/table_6/result.csv")
+result.to_csv("JSS_Experiments/table_3/result.csv")
