@@ -16,4 +16,5 @@ compare.py
 psc.py
 Figure_1.py
 compare_txt.py
+.vscode/
 __pycache__/
