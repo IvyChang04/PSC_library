@@ -77,15 +77,42 @@ The `[model_path]` is the path to save the trained model.
 
 The `[cluster_result_format]` can be either .txt or .csv. It represent the format of the cluster result.
 
+<!-- EXPERIMENT-->
+
+# Experiment
+
+The 'JSS_Experiments' directory contains the code for the experiments detailed in the paper "PSC: a Python Package for Parametric Spectral Clustering." This includes scripts for experiments on the Firewall, NIDS, and Synthesis datasets.
+
+Prior to executing these scripts, ensure that the necessary datasets have been downloaded and placed in the appropriate location. The datasets can be obtained from the following sources:
+
+- Firewall Dataset: https://archive.ics.uci.edu/dataset/542/internet+firewall+data
+- NIDS Dataset: https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset
+
+Please place the downloaded datasets in the ‘JSS_Experiments/datasets’ directory. Ensure the datasets are correctly located before running the scripts.
+
+```sh
+bash JSS_Experiemnts/run.sh
+```
+
+<!-- Test -->
+
+# Test
+
+To run the test, use the following command:
+
+```sh
+pytest tests
+```
+
 <!-- LICENSE -->
 
-## License
+# License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <!-- CONTACT -->
 
-## Contact
+# Contact
 
 | Author | Ivy Chang           | Hsin Ju Tai         |
 | ------ | ------------------- | ------------------- |
