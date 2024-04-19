@@ -13,11 +13,11 @@ This repository provides a PyTorch implementation of the **Parametric Spectral C
 Parametric Spectral Clustering requires:
 
 -   Python (>= 3.8)
--   NumPy (>= 1.24.3)
--   SciPy (>= 1.10.3)
--   PyTorch (>= 1.12.1)
--   scikit-learn (>= 1.3.2)
--   Pandas (>= 2.0.3)
+-   NumPy (>= 1.26.4)
+-   SciPy (>= 1.13.0)
+-   PyTorch (>= 2.2.2)
+-   scikit-learn (>= 1.4.2)
+-   Pandas (>= 2.2.2)
 
 ---
 
@@ -85,13 +85,13 @@ The 'JSS_Experiments' directory contains the code for the experiments detailed i
 
 Prior to executing these scripts, ensure that the necessary datasets have been downloaded and placed in the appropriate location. The datasets can be obtained from the following sources:
 
-- Firewall Dataset: https://archive.ics.uci.edu/dataset/542/internet+firewall+data
-- NIDS Dataset: https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset
+-   NIDS Dataset: https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset
 
 Please place the downloaded datasets in the ‘JSS_Experiments/datasets’ directory. Ensure the datasets are correctly located before running the scripts.
 
 ```sh
-bash JSS_Experiemnts/run.sh
+cd JSS_Experiments
+bash run.sh
 ```
 
 <!-- Test -->

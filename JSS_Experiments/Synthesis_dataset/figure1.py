@@ -22,8 +22,6 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-# f = open("y_pred.txt", "a+")
-
 r = 72
 rng = np.random.RandomState(r)
 torch.manual_seed(0)
