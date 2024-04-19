@@ -64,7 +64,7 @@ Using UCI ML hand-written digits datasets as an example.
 After installation, you may run the following scripts directly.
 
 ```sh
-python bin\run.py [data] [rate] [n_cluster] [model_path] [cluster_result_format]
+python bin/run.py [data] [rate] [n_cluster] [model_path] [cluster_result_format]
 ```
 
 The `[data]` can accept .txt, .csv, and .npy format of data.
