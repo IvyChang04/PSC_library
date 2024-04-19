@@ -9,11 +9,13 @@ classifiers = [
 ]
 
 requirements = [
-    "torch",
-    "numpy",
-    "scikit-learn",
-    "scipy",
-    "pandas",
+    "scipy>=1.13.0",
+    "torch>=2.2.2",
+    "torchaudio>=2.2.2",
+    "torchvision>=0.17.2",
+    "scikit-learn>=1.4.2",
+    "pandas>=2.2.2",
+    "numpy==1.26.4",
 ]
 
 scripts = [
