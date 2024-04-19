@@ -91,7 +91,7 @@ Please place the downloaded datasets in the ‘JSS_Experiments/datasets’ direc
 
 ```sh
 cd JSS_Experiments
-bash run.sh
+python run.py
 ```
 
 <!-- Test -->
