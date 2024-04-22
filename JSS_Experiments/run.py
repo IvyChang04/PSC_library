@@ -65,7 +65,7 @@ for data_size_table5 in data_sizes_table5:
             "psc",
             "--size",
             data_size_table5,
-            "--rate",
+            "--ratio",
             "0.9",
         ]
     )
