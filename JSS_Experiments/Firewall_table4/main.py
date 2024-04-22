@@ -8,6 +8,9 @@ import warnings
 import sklearn
 from sklearn.cluster import SpectralClustering, KMeans
 from ParametricSpectralClustering import PSC, Accuracy
+from pathlib import Path
+
+ROOT = Path("JSS_Experiments").parent.absolute()
 
 warnings.filterwarnings("ignore")
 
@@ -37,14 +40,14 @@ class Net(nn.Module):
         return self.model(x)
 
 
-df = pd.read_csv("JSS_Experiments/datasets/firewall.csv")
+df = pd.read_csv(ROOT / "datasets" / "firewall.csv")
 action = {"allow": 1, "deny": 2, "drop": 3, "reset-both": 4}
 df["Action"] = df["Action"].map(action)
 y_tmp = df["Action"].values
 x_tmp = df.drop(["Action"], axis=1).values
 
 
-f = open("JSS_Experiments/Firewall_table4/log.txt", "a+")
+f = open(ROOT / "Firewall_table4" / "log.txt", "a+")
 now = str(datetime.datetime.now())
 f.write("======" + now + "======\n")
 
@@ -77,7 +80,7 @@ psc_time_1_30000 = []
 psc_time_1_45000 = []
 psc_time_1_60000 = []
 
-result = pd.read_csv("JSS_Experiments/Firewall_table4/result.csv")
+result = pd.read_csv(ROOT / "Firewall_table4" / "result.csv")
 
 for _ in range(10):
     if "sc" in methods:
@@ -431,4 +434,4 @@ if "psc" in methods:
 
 
 f.close()
-result.to_csv("JSS_Experiments/Firewall_table4/result.csv", index=False)
+result.to_csv(ROOT / "Firewall_table4" / "result.csv", index=False)

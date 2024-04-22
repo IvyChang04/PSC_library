@@ -9,6 +9,9 @@ import sklearn
 from sklearn.cluster import SpectralClustering, KMeans
 from ParametricSpectralClustering import PSC, Accuracy
 from scipy.io import arff
+from pathlib import Path
+
+ROOT = Path("JSS_Experiments").parent.absolute()
 
 warnings.filterwarnings("ignore")
 
@@ -48,12 +51,12 @@ class Net(nn.Module):
 dataset = args.dataset
 
 if "Pendigits" in dataset:
-    pendigits = pd.read_csv("JSS_Experiments/datasets/Pendigits.csv")
+    pendigits = pd.read_csv(ROOT / "datasets" / "Pendigits.csv")
     y_tmp = pendigits["class"].values
     x_tmp = pendigits.drop(columns=["id", "class"]).values
 
 elif "Letter" in dataset:
-    letter_arff = arff.loadarff("JSS_Experiments/datasets/dataset_6_letter.arff")
+    letter_arff = arff.loadarff(ROOT / "datasets" / "dataset_6_letter.arff")
     letter = pd.DataFrame(letter_arff[0])
     letter["class"] = letter["class"].astype(str)
 
@@ -93,7 +96,7 @@ elif "Letter" in dataset:
     scaler = sklearn.preprocessing.StandardScaler().fit(x_data_tmp)
     x_tmp = scaler.transform(x_data_tmp)
 
-f = open("JSS_Experiments/table_3/log.txt", "a+")
+f = open(ROOT / "table_3"/ "log.txt", "a+")
 now = str(datetime.datetime.now())
 f.write("======" + now + "======\n")
 f.write("dataset: " + str(args.dataset) + "\n")
@@ -124,7 +127,7 @@ psc_total_acc = []
 psc_total_ari = []
 psc_total_ami = []
 
-result = pd.read_csv("JSS_Experiments/table_3/result.csv", index_col=[0, 1])
+result = pd.read_csv(ROOT / "table_3" / "result.csv", index_col=[0, 1])
 
 for _ in range(10):
     if "sc" in methods:
@@ -276,4 +279,4 @@ if "kmeans" in methods:
     result.at[("KMeans", "AMI"), args.dataset] = str(ami_mean) + "±" + str(ami_std)
 
 f.close()
-result.to_csv("JSS_Experiments/table_3/result.csv")
+result.to_csv(ROOT / "table_3" / "result.csv")
