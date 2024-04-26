@@ -291,14 +291,14 @@ if "psc" in methods:
         + "\n"
     )
     f.write(
-        "[n+1:m] acc: "
+        "[n+1:n+m] acc: "
         + str(psc_acc_1_15000_mean)
         + "±"
         + str(psc_acc_1_15000_std)
         + "\n"
     )
     f.write(
-        "[1:m] acc: "
+        "all acc: "
         + str(psc_acc_1_15000_mean)
         + "±"
         + str(psc_acc_1_15000_std)
@@ -320,14 +320,14 @@ if "psc" in methods:
         + "\n"
     )
     f.write(
-        "[n+1:m] acc: "
+        "[n+1:n+m] acc: "
         + str(psc_acc_15001_30000_mean)
         + "±"
         + str(psc_acc_15001_30000_std)
         + "\n"
     )
     f.write(
-        "[1:m] acc: "
+        "all acc: "
         + str(psc_acc_1_30000_mean)
         + "±"
         + str(psc_acc_1_30000_std)
@@ -349,14 +349,14 @@ if "psc" in methods:
         + "\n"
     )
     f.write(
-        "[n+1:m] acc: "
+        "[n+1:n+m] acc: "
         + str(psc_acc_15001_45000_mean)
         + "±"
         + str(psc_acc_15001_45000_std)
         + "\n"
     )
     f.write(
-        "[1:n] acc: "
+        "all acc: "
         + str(psc_acc_1_45000_mean)
         + "±"
         + str(psc_acc_1_45000_std)
@@ -378,14 +378,14 @@ if "psc" in methods:
         + "\n"
     )
     f.write(
-        "[n+1:m] acc: "
+        "[n+1:n+m] acc: "
         + str(psc_acc_15001_60000_mean)
         + "±"
         + str(psc_acc_15001_60000_std)
         + "\n"
     )
     f.write(
-        "[1:n] acc: "
+        "all acc: "
         + str(psc_acc_1_60000_mean)
         + "±"
         + str(psc_acc_1_60000_std)
@@ -410,37 +410,37 @@ if "psc" in methods:
         str(psc_time_1_30000_mean) + "±" + str(psc_time_1_30000_std)
     )
     result.at[2, "Accuracy.1"] = (
-        str(psc_acc_1_15000_mean) + "±" + str(psc_acc_1_15000_std)
+        str(psc_acc_1_30000_mean) + "±" + str(psc_acc_1_30000_std)
     )
     result.at[2, "Accuracy.2"] = (
-        str(psc_acc_15001_30000_mean) + "±" + str(psc_acc_15001_30000_std)
+        str(psc_acc_1_15000_mean) + "±" + str(psc_acc_1_15000_std)
     )
     result.at[2, "Accuracy.3"] = (
-        str(psc_acc_1_30000_mean) + "±" + str(psc_acc_1_30000_std)
+        str(psc_acc_15001_30000_mean) + "±" + str(psc_acc_15001_30000_std)
     )
     result.at[3, "Time.1"] = (
         str(psc_time_1_45000_mean) + "±" + str(psc_time_1_45000_std)
     )
     result.at[3, "Accuracy.1"] = (
-        str(psc_acc_1_15000_mean) + "±" + str(psc_acc_1_15000_std)
+        str(psc_acc_1_45000_mean) + "±" + str(psc_acc_1_45000_std)
     )
     result.at[3, "Accuracy.2"] = (
-        str(psc_acc_15001_45000_mean) + "±" + str(psc_acc_15001_45000_std)
+        str(psc_acc_1_15000_mean) + "±" + str(psc_acc_1_15000_std)
     )
     result.at[3, "Accuracy.3"] = (
-        str(psc_acc_1_45000_mean) + "±" + str(psc_acc_1_45000_std)
+        str(psc_acc_15001_45000_mean) + "±" + str(psc_acc_15001_45000_std)
     )
     result.at[4, "Time.1"] = (
         str(psc_time_1_60000_mean) + "±" + str(psc_time_1_60000_std)
     )
     result.at[4, "Accuracy.1"] = (
-        str(psc_acc_1_15000_mean) + "±" + str(psc_acc_1_15000_std)
+        str(psc_acc_1_60000_mean) + "±" + str(psc_acc_1_60000_std)
     )
     result.at[4, "Accuracy.2"] = (
-        str(psc_acc_15001_60000_mean) + "±" + str(psc_acc_15001_60000_std)
+        str(psc_acc_1_15000_mean) + "±" + str(psc_acc_1_15000_std)
     )
     result.at[4, "Accuracy.3"] = (
-        str(psc_acc_1_60000_mean) + "±" + str(psc_acc_1_60000_std)
+        str(psc_acc_15001_60000_mean) + "±" + str(psc_acc_15001_60000_std)
     )
 
 
