@@ -12,13 +12,13 @@ def run_command(command):
 
 
 # Experiment for table 3
-datasets_table3 = ["Pendigits", "Letter"]
+datasets_table3 = ["Firewall", "Letter"]
 for dataset in datasets_table3:
     run_command(
         [
             "python",
             "table_3/main.py",
-            "--method",
+            "--methods",
             "sc",
             "psc",
             "kmeans",

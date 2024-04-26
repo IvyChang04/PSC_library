@@ -33,10 +33,24 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-class Net(nn.Module):
+class Net_Letter(nn.Module):
     def __init__(self) -> None:
-        super(Net, self).__init__()
+        super(Net_Letter, self).__init__()
 
+        self.model = nn.Sequential(
+            nn.Linear(16, 32),
+            nn.Linear(32, 64),
+            nn.Linear(64, 32),
+            nn.Linear(32, 26),
+        )
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class Net_Firewall(nn.Module):
+    def __init__(self) -> None:
+        super(Net_Firewall, self).__init__()
         self.model = nn.Sequential(
             nn.Linear(11, 32),
             nn.Linear(32, 64),
@@ -50,10 +64,12 @@ class Net(nn.Module):
 
 dataset = args.dataset
 
-if "Pendigits" in dataset:
-    pendigits = pd.read_csv(ROOT / "datasets" / "Pendigits.csv")
-    y_tmp = pendigits["class"].values
-    x_tmp = pendigits.drop(columns=["id", "class"]).values
+if "Firewall" in dataset:
+    firewall = pd.read_csv(ROOT / "datasets" / "firewall.csv")
+    action = {"allow": 1, "deny": 2, "drop": 3, "reset-both": 4}
+    firewall["Action"] = firewall["Action"].map(action)
+    y_tmp = firewall["Action"].values
+    x_tmp = firewall.drop(["Action"], axis=1).values
 
 elif "Letter" in dataset:
     letter_arff = arff.loadarff(ROOT / "datasets" / "dataset_6_letter.arff")
@@ -96,7 +112,7 @@ elif "Letter" in dataset:
     scaler = sklearn.preprocessing.StandardScaler().fit(x_data_tmp)
     x_tmp = scaler.transform(x_data_tmp)
 
-f = open(ROOT / "table_3"/ "log.txt", "a+")
+f = open(ROOT / "table_3" / "log.txt", "a+")
 now = str(datetime.datetime.now())
 f.write("======" + now + "======\n")
 f.write("dataset: " + str(args.dataset) + "\n")
@@ -131,13 +147,20 @@ result = pd.read_csv(ROOT / "table_3" / "result.csv", index_col=[0, 1])
 
 for _ in range(10):
     if "sc" in methods:
-        spectral_clustering = SpectralClustering(
-            n_clusters=4,
-            eigen_solver="arpack",
-            affinity="nearest_neighbors",
-            assign_labels="kmeans",
-        )
-
+        if "Firewall" in dataset:
+            spectral_clustering = SpectralClustering(
+                n_clusters=4,
+                eigen_solver="arpack",
+                affinity="nearest_neighbors",
+                assign_labels="kmeans",
+            )
+        elif "Letter" in dataset:
+            spectral_clustering = SpectralClustering(
+                n_clusters=26,
+                eigen_solver="arpack",
+                affinity="nearest_neighbors",
+                assign_labels="kmeans",
+            )
         # measure time spent
         start_time = round(time.time() * 1000)
         sc_index = spectral_clustering.fit_predict(x)
@@ -159,14 +182,24 @@ for _ in range(10):
 
     if "psc" in methods:
         kmeans = KMeans(n_clusters=4, init="random", n_init="auto", algorithm="elkan")
-        psc = PSC(
-            model=Net(),
-            clustering_method=kmeans,
-            sampling_ratio=0,
-            n_components=4,
-            n_neighbor=4,
-            batch_size_data=args.size,
-        )
+        if "Firewall" in dataset:
+            psc = PSC(
+                model=Net_Firewall(),
+                clustering_method=kmeans,
+                sampling_ratio=0,
+                n_components=4,
+                n_neighbor=4,
+                batch_size_data=args.size,
+            )
+        elif "Letter" in dataset:
+            psc = PSC(
+                model=Net_Letter(),
+                clustering_method=kmeans,
+                sampling_ratio=0,
+                n_components=26,
+                n_neighbor=4,
+                batch_size_data=args.size,
+            )
 
         # measure total time spent
         start_time = round(time.time() * 1000)
@@ -188,8 +221,14 @@ for _ in range(10):
         psc_total_ami.append(psc_ami)
 
     if "kmeans" in methods:
-        kmeans = KMeans(n_clusters=4, init="random", n_init="auto", algorithm="elkan")
-
+        if "Firewall" in dataset:
+            kmeans = KMeans(
+                n_clusters=4, init="random", n_init="auto", algorithm="elkan"
+            )
+        elif "Letter" in dataset:
+            kmeans = KMeans(
+                n_clusters=26, init="random", n_init="auto", algorithm="elkan"
+            )
         start_time = round(time.time() * 1000)
         kmeans_index = kmeans.fit_predict(x)
         end_time = round(time.time() * 1000)
