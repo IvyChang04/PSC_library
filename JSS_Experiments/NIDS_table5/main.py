@@ -9,6 +9,14 @@ import argparse
 import warnings
 import numpy as np
 from pathlib import Path
+import random
+import torch
+
+r = 72
+rng = np.random.RandomState(r)
+torch.manual_seed(0)
+random.seed(int(r))
+np.random.seed(0)
 
 ROOT = Path("JSS_Experiments").parent.absolute()
 
@@ -101,6 +109,7 @@ for i in range(10):
             eigen_solver="arpack",
             affinity="nearest_neighbors",
             assign_labels="kmeans",
+            random_state=rng,
         )
 
         # measure time spent
@@ -125,7 +134,7 @@ for i in range(10):
 
     # --------kmeans--------
     if "kmeans" in methods:
-        kmeans = KMeans(n_clusters=10, init="random", n_init="auto", algorithm="elkan")
+        kmeans = KMeans(n_clusters=10, init="random", n_init="auto", algorithm="elkan", random_state=rng,)
 
         # measure time spent
         start_time = round(time.time() * 1000)
@@ -150,7 +159,7 @@ for i in range(10):
     # --------Parametric Spectral Clustering--------
     if "psc" in methods:
         model = Net_emb()
-        kmeans = KMeans(n_clusters=10, init="random", n_init="auto", algorithm="elkan")
+        kmeans = KMeans(n_clusters=10, init="random", n_init="auto", algorithm="elkan", random_state=rng)
         psc = PSC(
             model=model,
             clustering_method=kmeans,
@@ -158,6 +167,7 @@ for i in range(10):
             n_components=10,
             n_neighbor=10,
             batch_size_data=args.size,
+            random_state=rng,
         )
 
         # measure time spent
@@ -166,8 +176,9 @@ for i in range(10):
         psc_index = psc.predict(x)
         end_time = round(time.time() * 1000)
 
+        file_name = "psc_model" + str(i + 1) + ".pkl"
         # save model
-        psc.save_model(ROOT / "NIDS_table5" / "psc_model" / str(i + 1)+".pkl")
+        psc.save_model(ROOT / "NIDS_table5" / file_name)
 
         # calculate acc, ari, ami
         acc = Accuracy(y_true=y, y_pred=psc_index)

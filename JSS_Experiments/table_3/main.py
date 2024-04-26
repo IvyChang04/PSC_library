@@ -10,6 +10,14 @@ from sklearn.cluster import SpectralClustering, KMeans
 from ParametricSpectralClustering import PSC, Accuracy
 from scipy.io import arff
 from pathlib import Path
+import random
+import torch
+
+r = 72
+rng = np.random.RandomState(r)
+torch.manual_seed(0)
+random.seed(int(r))
+np.random.seed(0)
 
 ROOT = Path("JSS_Experiments").parent.absolute()
 
@@ -153,6 +161,7 @@ for _ in range(10):
                 eigen_solver="arpack",
                 affinity="nearest_neighbors",
                 assign_labels="kmeans",
+                random_state=rng,
             )
         elif "Letter" in dataset:
             spectral_clustering = SpectralClustering(
@@ -160,6 +169,7 @@ for _ in range(10):
                 eigen_solver="arpack",
                 affinity="nearest_neighbors",
                 assign_labels="kmeans",
+                random_state=rng,
             )
         # measure time spent
         start_time = round(time.time() * 1000)
@@ -190,6 +200,7 @@ for _ in range(10):
                 n_components=4,
                 n_neighbor=4,
                 batch_size_data=args.size,
+                random_state=rng,
             )
         elif "Letter" in dataset:
             psc = PSC(
@@ -199,6 +210,7 @@ for _ in range(10):
                 n_components=26,
                 n_neighbor=4,
                 batch_size_data=args.size,
+                random_state=rng,
             )
 
         # measure total time spent
@@ -223,11 +235,11 @@ for _ in range(10):
     if "kmeans" in methods:
         if "Firewall" in dataset:
             kmeans = KMeans(
-                n_clusters=4, init="random", n_init="auto", algorithm="elkan"
+                n_clusters=4, init="random", n_init="auto", algorithm="elkan", random_state=rng,
             )
         elif "Letter" in dataset:
             kmeans = KMeans(
-                n_clusters=26, init="random", n_init="auto", algorithm="elkan"
+                n_clusters=26, init="random", n_init="auto", algorithm="elkan", random_state=rng,
             )
         start_time = round(time.time() * 1000)
         kmeans_index = kmeans.fit_predict(x)

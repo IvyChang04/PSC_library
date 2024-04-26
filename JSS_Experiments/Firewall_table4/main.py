@@ -9,6 +9,14 @@ import sklearn
 from sklearn.cluster import SpectralClustering, KMeans
 from ParametricSpectralClustering import PSC, Accuracy
 from pathlib import Path
+import random
+import torch
+
+r = 72
+rng = np.random.RandomState(r)
+torch.manual_seed(0)
+random.seed(int(r))
+np.random.seed(0)
 
 ROOT = Path("JSS_Experiments").parent.absolute()
 
@@ -89,6 +97,7 @@ for _ in range(10):
             eigen_solver="arpack",
             affinity="nearest_neighbors",
             assign_labels="kmeans",
+            random_state=rng,
         )
 
         # measure time spent
@@ -118,6 +127,7 @@ for _ in range(10):
             init="random",
             n_init="auto",
             algorithm="elkan",
+            random_state=rng,
         )
         psc = PSC(
             model=Net(),
@@ -126,6 +136,7 @@ for _ in range(10):
             n_components=4,
             n_neighbor=4,
             batch_size_data=args.size,
+            random_state=rng,
         )
 
         # measure training time spent
