@@ -9,7 +9,9 @@ import torch.nn as nn
 
 from sklearn import cluster, datasets
 from sklearn.preprocessing import StandardScaler
+from pathlib import Path
 
+ROOT = Path("JSS_Experiments").parent.absolute()
 
 class KMedian:
     def __init__(self, n_clusters, max_iters=100) -> None:
@@ -232,7 +234,7 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
 
 
 plt.savefig(
-    "JSS_Experiments/Synthesis_dataset/Figure2_custom_clustering_KMedian.pdf",
+    ROOT / "Synthesis_dataset" / "Figure2_custom_clustering_KMedian.pdf",
     format="pdf",
 )
 plt.show()

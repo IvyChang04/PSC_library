@@ -10,8 +10,10 @@ from sklearn import cluster, datasets, mixture
 from sklearn.neighbors import kneighbors_graph
 from sklearn.preprocessing import StandardScaler
 from itertools import cycle, islice
-
+from pathlib import Path
 from ParametricSpectralClustering.psc import PSC
+
+ROOT = Path("JSS_Experiments").parent.absolute()
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -360,6 +362,7 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
         plt.xticks(())
         plt.yticks(())
         plot_num += 1
-fig_name = "JSS_Experiments/Synthesis_dataset/Figure1-" + str(fig_num) + ".pdf"
+name = "Figure1-" + str(fig_num) + ".pdf"
+fig_name = ROOT / "Synthesis_dataset" / name
 plt.savefig(fig_name, format="pdf", bbox_inches="tight")
 # f.close()
