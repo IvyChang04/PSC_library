@@ -18,6 +18,7 @@ Parametric Spectral Clustering requires:
 -   PyTorch (>= 2.2.2)
 -   scikit-learn (>= 1.4.2)
 -   Pandas (>= 2.2.2)
+-   Matplotlib (3.8.4)
 
 ---
 
