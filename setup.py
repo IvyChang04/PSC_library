@@ -16,6 +16,7 @@ requirements = [
     "scikit-learn>=1.4.2",
     "pandas>=2.2.2",
     "numpy==1.26.4",
+    "matplotlib>=3.8.4",
 ]
 
 scripts = [
