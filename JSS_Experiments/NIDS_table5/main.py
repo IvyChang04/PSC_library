@@ -11,6 +11,7 @@ import numpy as np
 from pathlib import Path
 import random
 import torch
+import os
 
 r = 72
 rng = np.random.RandomState(r)
@@ -27,6 +28,12 @@ parser.add_argument("-datasize", "--size", type=int, help="data size used for tr
 parser.add_argument("-methods", "--methods", nargs="+", help="which method to test")
 parser.add_argument("-sampling_ratio", "--ratio", type=float, help="sampling ratio")
 args = parser.parse_args()
+
+for entry in os.listdir("./datasets"):
+    if "NF-UQ-NIDS-v2.csv" not in entry:
+        raise FileNotFoundError(
+            "The dataset (NF-UQ-NIDS_v2.csv) is too large (approximately 13GB) to upload to GitHub; users will need to download it from the website (https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset)."
+        )
 
 
 class Net_emb(nn.Module):
@@ -134,7 +141,13 @@ for i in range(10):
 
     # --------kmeans--------
     if "kmeans" in methods:
-        kmeans = KMeans(n_clusters=10, init="random", n_init="auto", algorithm="elkan", random_state=rng,)
+        kmeans = KMeans(
+            n_clusters=10,
+            init="random",
+            n_init="auto",
+            algorithm="elkan",
+            random_state=rng,
+        )
 
         # measure time spent
         start_time = round(time.time() * 1000)
@@ -159,7 +172,13 @@ for i in range(10):
     # --------Parametric Spectral Clustering--------
     if "psc" in methods:
         model = Net_emb()
-        kmeans = KMeans(n_clusters=10, init="random", n_init="auto", algorithm="elkan", random_state=rng)
+        kmeans = KMeans(
+            n_clusters=10,
+            init="random",
+            n_init="auto",
+            algorithm="elkan",
+            random_state=rng,
+        )
         psc = PSC(
             model=model,
             clustering_method=kmeans,
