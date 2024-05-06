@@ -54,8 +54,10 @@ class Net_emb(nn.Module):
         x = self.output_layer(x)
         return x
 
-
-df = pd.read_csv(ROOT / "datasets" / "NF-UQ-NIDS-v2.csv", nrows=1040000)
+try:
+    df = pd.read_csv(ROOT / "datasets" / "NF-UQ-NIDS-v2.csv", nrows=1040000)
+except FileNotFoundError:
+    raise FileNotFoundError("The dataset NF-UQ-NIDS_v2.csv is too large (approximately 13GB) to upload to GitHub; users will need to download it from the website (https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset)")
 Class = {
     "Benign": 1,
     "DDoS": 2,
