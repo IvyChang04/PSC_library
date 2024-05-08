@@ -367,10 +367,7 @@ class PSC:
         return total_loss / self.epochs
 
     def __check_file_exist(self, file_name) -> bool:
-        for entry in os.listdir("./"):
-            if entry == file_name:
-                return True
-        return False
+        return os.path.exists(file_name)
 
     def __check_clustering_method(self) -> None:
         if self.clustering is None:
