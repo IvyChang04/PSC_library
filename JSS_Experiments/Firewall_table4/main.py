@@ -30,6 +30,7 @@ parser.add_argument(
     nargs="+",
     help="select clustering method (psc, sc, kmeans)",
 )
+parser.add_argument("-model_path", "--path", default=None, type=str, help="model path")
 args = parser.parse_args()
 
 
@@ -118,9 +119,6 @@ for _ in range(10):
         sc_acc.append(sc_accRate)
         sc_time.append(end_time - start_time)
 
-    # ---------- PSC ----------
-    # only need train for once
-    # fixed_n_wo_sampling_ratio.py --size 60000 --method
     if "psc" in methods:
         kmeans = KMeans(
             n_clusters=4,
@@ -139,12 +137,17 @@ for _ in range(10):
             random_state=rng,
         )
 
-        # measure training time spent
-        train_start_time = round(time.time() * 1000)
-        psc.fit(x[:15000])
-        psc_index = psc.predict(x[:15000])
-        train_end_time = round(time.time() * 1000)
-        train_total_time = train_end_time - train_start_time
+        if args.path == None:
+            # measure training time spent
+            train_start_time = round(time.time() * 1000)
+            psc.fit(x[:15000])
+            psc_index = psc.predict(x[:15000])
+            train_end_time = round(time.time() * 1000)
+            train_total_time = train_end_time - train_start_time
+        else:
+            psc.load_model(ROOT / args.path / "model.pkl")
+            psc_index = psc.predict(x[:15000])
+            train_total_time = np.nan
 
         # calculate acc on [1:15000]
         acc = Accuracy(y_true=y[:15000], y_pred=psc_index[:15000])
@@ -227,6 +230,9 @@ for _ in range(10):
         f.write("ami: " + str(psc_ami) + "\n")
         psc_acc_15001_60000.append(psc_accRate)
 
+    if args.path != None:
+        break
+
 if "sc" in methods:
     sc_acc_mean = round(np.mean(sc_acc), 3)
     sc_acc_std = round(np.std(sc_acc), 3)
@@ -246,7 +252,6 @@ if "sc" in methods:
     result.at[(args.size / 15000), "Accuracy"] = (
         str(sc_acc_mean) + " ± " + str(sc_acc_std)
     )
-
 
 if "psc" in methods:
     psc_acc_1_15000_mean = round(np.mean(psc_acc_1_15000), 3)
@@ -272,6 +277,16 @@ if "psc" in methods:
     psc_time_1_45000_std = round(np.std(psc_time_1_45000), 3)
     psc_time_1_60000_mean = round(np.mean(psc_time_1_60000), 2)
     psc_time_1_60000_std = round(np.std(psc_time_1_60000), 3)
+
+    if args.path != None:
+        psc_time_1_15000_mean = np.nan
+        psc_time_1_15000_std = np.nan
+        psc_time_1_30000_mean = np.nan
+        psc_time_1_30000_std = np.nan
+        psc_time_1_45000_mean = np.nan
+        psc_time_1_45000_std = np.nan
+        psc_time_1_60000_mean = np.nan
+        psc_time_1_60000_std = np.nan
 
     # write result into log.txt
     f.write("======= PSC mean ± std =======\n")

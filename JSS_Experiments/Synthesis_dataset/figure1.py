@@ -22,6 +22,7 @@ parser.add_argument(
     type=str,
     help="the dataset used in this single experiment",
 )
+parser.add_argument("-model_path", "--path", default=None, type=str, help="model path")
 args = parser.parse_args()
 
 r = 72
@@ -233,19 +234,19 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
     # ============
     # Create cluster objects
     # ============
-    KMeans = cluster.KMeans(
-        n_clusters=params["n_clusters"],
-        init="random",
-        n_init="auto",
-        algorithm="elkan",
-        random_state=rng,
-    )
-    spectral = cluster.SpectralClustering(
-        n_clusters=params["n_clusters"],
-        eigen_solver="arpack",
-        affinity="nearest_neighbors",
-        random_state=rng,
-    )
+    # KMeans = cluster.KMeans(
+    #     n_clusters=params["n_clusters"],
+    #     init="random",
+    #     n_init="auto",
+    #     algorithm="elkan",
+    #     random_state=rng,
+    # )
+    # spectral = cluster.SpectralClustering(
+    #     n_clusters=params["n_clusters"],
+    #     eigen_solver="arpack",
+    #     affinity="nearest_neighbors",
+    #     random_state=rng,
+    # )
     torch.manual_seed(0)
     model_1 = Net1(params["n_clusters"])
     torch.manual_seed(0)
@@ -305,7 +306,11 @@ for i_dataset, (name, dataset, algo_params) in enumerate(datasets):
                 + " may not work as expected.",
                 category=UserWarning,
             )
-            algorithm.fit(X)
+            if args.path == None:
+                algorithm.fit(X)
+            else:
+                filename = name + "_figure1.pkl"
+                algorithm.load_model(ROOT / args.path / filename)
             # if algo_name == "PSC":
             #     for name, param in algorithm.model.named_parameters():
             #         print(f"Parameter name: {name}, Shape: {param.shape}")

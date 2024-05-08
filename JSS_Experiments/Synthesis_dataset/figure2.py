@@ -10,8 +10,13 @@ import torch.nn as nn
 from sklearn import cluster, datasets
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
+import argparse
 
 ROOT = Path("JSS_Experiments").parent.absolute()
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-model_path", "--path", default=None, type=str, help="model path")
+args = parser.parse_args()
 
 class KMedian:
     def __init__(self, n_clusters, max_iters=100) -> None:
@@ -189,7 +194,13 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
                 + " may not work as expected.",
                 category=UserWarning,
             )
-            algorithm.fit(X)
+            if name == "PSC with k-median":
+                if args.path == None:
+                    algorithm.fit(X)
+                else:
+                    algorithm.load_model(ROOT / args.path / "figure2.pkl")
+            else:
+                algorithm.fit(X)
 
         t1 = time.time()
         if hasattr(algorithm, "labels_"):

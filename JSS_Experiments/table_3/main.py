@@ -37,7 +37,7 @@ parser.add_argument(
     type=str,
     help="choose Letter dataset or Pendigits dataset in this experiment",
 )
-
+parser.add_argument("-model_path", "--path", default=None, type=str, help="model path")
 args = parser.parse_args()
 
 
@@ -191,8 +191,9 @@ for _ in range(10):
         sc_total_ari.append(sc_ari)
 
     if "psc" in methods:
-        kmeans = KMeans(n_clusters=4, init="random", n_init="auto", algorithm="elkan")
+
         if "Firewall" in dataset:
+            kmeans = KMeans(n_clusters=4, init="random", n_init="auto", algorithm="elkan")
             psc = PSC(
                 model=Net_Firewall(),
                 clustering_method=kmeans,
@@ -203,6 +204,7 @@ for _ in range(10):
                 random_state=rng,
             )
         elif "Letter" in dataset:
+            kmeans = KMeans(n_clusters=26, init="random", n_init="auto", algorithm="elkan")
             psc = PSC(
                 model=Net_Letter(),
                 clustering_method=kmeans,
@@ -213,11 +215,17 @@ for _ in range(10):
                 random_state=rng,
             )
 
-        # measure total time spent
-        start_time = round(time.time() * 1000)
-        psc.fit(x)
-        psc_index = psc.predict(x)
-        end_time = round(time.time() * 1000)
+        if args.path == None:
+            # measure total time spent
+            start_time = round(time.time() * 1000)
+            psc.fit(x)
+            psc_index = psc.predict(x)
+            end_time = round(time.time() * 1000)
+        else:
+            filename = dataset + "_model_psc.pkl"
+            path = ROOT / args.path / filename
+            psc.load_model(path)
+            psc_index = psc.predict(x)
 
         # calculate acc[1:m]
         acc = Accuracy(y_true=y, y_pred=psc_index)
@@ -226,7 +234,7 @@ for _ in range(10):
         f.write("acc rate: " + str(psc_accRate) + "\n")
         f.write("ari: " + str(psc_ari) + "\n")
         f.write("ami: " + str(psc_ami) + "\n")
-        f.write("time spent: " + str(end_time - start_time) + "\n\n")
+        if args.path == None: f.write("time spent: " + str(end_time - start_time) + "\n\n")
 
         psc_total_acc.append(psc_accRate)
         psc_total_ari.append(psc_ari)
@@ -257,6 +265,10 @@ for _ in range(10):
         kmeans_total_acc.append(kmeans_accRate)
         kmeans_total_ari.append(kmeans_ari)
         kmeans_total_ami.append(kmeans_ami)
+    
+    if args.path != None:
+        break
+        
 
 if "sc" in methods:
     ari_mean, ari_std = np.mean(sc_total_ari), np.std(sc_total_ari)
