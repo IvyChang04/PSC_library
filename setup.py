@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Operating System :: OS Independent",
 ]
@@ -34,7 +34,7 @@ keywords = [
 
 setup(
     name="ParametricSpectralClustering",
-    version="0.0.3",
+    version="0.0.4",
     description="A library for users to use parametric spectral clustering",
     long_description=open("README.md").read() + "\n\n" + open("CHANGELOG.txt").read(),
     long_description_content_type="text/markdown",
