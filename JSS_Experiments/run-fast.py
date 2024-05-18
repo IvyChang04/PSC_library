@@ -19,9 +19,7 @@ for dataset in datasets_table3:
             "python",
             "table_3/main.py",
             "--methods",
-            "sc",
             "psc",
-            "kmeans",
             "--dataset",
             dataset,
             "--size",
@@ -33,19 +31,6 @@ for dataset in datasets_table3:
 
 # Experiment for table 4
 data_sizes_table4 = ["15000", "30000", "45000", "60000"]
-for data_size_table4 in data_sizes_table4:
-    run_command(
-        [
-            "python",
-            "Firewall_table4/main.py",
-            "--methods",
-            "sc",
-            "--size",
-            data_size_table4,
-            "--path",
-            "Firewall_table4",
-        ]
-    )
 
 run_command(
     [
@@ -76,9 +61,6 @@ for data_size_table5 in data_sizes_table5:
             "--path",
             "NIDS_table5",
         ]
-    )
-    run_command(
-        ["python", "NIDS_table5/main.py", "--methods", "sc", "--size", data_size_table5, "--path", "NIDS_table5"]
     )
 
 # Experiment for Figure 1
