@@ -12,6 +12,7 @@ from pathlib import Path
 import random
 import torch
 import os
+import sys
 
 r = 72
 rng = np.random.RandomState(r)
@@ -58,7 +59,9 @@ class Net_emb(nn.Module):
 try:
     df = pd.read_csv(ROOT / "datasets" / "NF-UQ-NIDS-v2.csv", nrows=1040000)
 except FileNotFoundError:
-    raise FileNotFoundError("The dataset NF-UQ-NIDS_v2.csv is too large (approximately 13GB) to upload to GitHub; users will need to download it from the website (https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset)")
+    #raise FileNotFoundError("The dataset NF-UQ-NIDS_v2.csv is too large (approximately 13GB) to upload to GitHub; users will need to download it from the website (https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset)")
+    print("The dataset NF-UQ-NIDS_v2.csv is too large (approximately 13GB) to upload to GitHub; users will need to download it from the website (https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset)", file=sys.stderr)
+    sys.exit(1)
 
 Class = {
     "Benign": 1,
