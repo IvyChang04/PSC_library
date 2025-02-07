@@ -82,34 +82,21 @@ The `[cluster_result_format]` can be either .txt or .csv. It represent the forma
 
 # Experiment
 
-The 'JSS_Experiments' directory contains the code for the experiments detailed in the paper "PSC: a Python Package for Parametric Spectral Clustering." This includes scripts for experiments on the Firewall, NIDS, and Synthesis datasets.
+The 'JSS_Experiments' directory contains the code for the experiments detailed in the paper "PSC: a Python Package for Parametric Spectral Clustering." Change the directory to `JSS_Experiments` and run
 
-Prior to executing these scripts, ensure that the necessary datasets have been downloaded and placed in the appropriate location. The datasets can be obtained from the following sources:
-
--   NIDS Dataset: https://www.kaggle.com/datasets/aryashah2k/nfuqnidsv2-network-intrusion-detection-dataset
-
-## Difference between run.py and run-fast.py
-
-Due to the long execution time of `run.py`, we provide another Python file: `run-fast.py`.
-`run-fast.py` uses the pre-trained model and only runs PSC-related experiments provided in `run.py`, which means it does not run the k-means and spectral clustering parts from `run.py`. If the user wants to see the full experimental results, please run `run.py`. However, if the user only wants to see the performance and results of parametric spectral clustering, then `run-fast.py` may be more efficient.
-
-## How to run experiments
-
-Please place the downloaded datasets in the ‘JSS_Experiments/datasets’ directory. Ensure the datasets are correctly located before running the scripts.
-
-for run-fast.py:
-
-```sh
-cd JSS_Experiments
-python run-fast.py
+```
+python run_exp.py
 ```
 
-for run.py:
+The script does the following:
 
-```sh
-cd JSS_Experiments
-python run.py
-```
+1. It generates two synthetic datasets: "double circles" and "double moons".
+
+1. It generates the scatter plots for these datasets.
+
+1. It applies PSC to both of these datasets.
+
+1. It fills the color for the data points on the scatter plot where the colors represents the cluster IDs.
 
 
 <!-- Test -->
@@ -130,10 +117,11 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <!-- CONTACT -->
 
-# Contact
+# Contact the authors
 
-| Author | Ivy Chang           | Hsin Ju Tai         |
-| ------ | ------------------- | ------------------- |
-| E-mail | ivy900403@gmail.com | hsinjutai@gmail.com |
+Ivy Chang: ivy900403@gmail.com
 
-Project Link: [Parametric Spectral Clsutering](https://github.com/IvyChang04/PSC_library)
+Hsin Ju Tai: hsinjutai@gmail.com
+
+Hung-Hsuan Chen: hhchen1105@acm.org
+
