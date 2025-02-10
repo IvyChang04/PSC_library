@@ -31,7 +31,7 @@ python setup.py install
 Use pip:
 
 ```sh
-pip install ParametricSpectralClustering
+pip install git+https://github.com/IvyChang04/PSC_library.git
 ```
 
 ## Sample Usage
