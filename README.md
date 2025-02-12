@@ -36,6 +36,108 @@ pip install git+https://github.com/IvyChang04/PSC_library.git
 
 ## Sample Usage
 
+### Example: Clustering Double Circles Dataset Using Python Code
+
+The following figure shows the scatter plot of the double circles dataset.
+
+![Scatter plot of the double circles dataset](./img/double_circles_scatter.png)
+
+This dataset is challenging for some clustering algorithms (e.g., K-means) because the one circle is inside another circle.  Our parametric spectral clustering learns to convert the data points into spectral space before clustering.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import torch.nn as nn
+
+from sklearn import cluster, datasets
+from sklearn.preprocessing import StandardScaler
+from ParametricSpectralClustering.psc import PSC
+
+# learn the mapping from feature space to spectral space
+class Net1(nn.Module):
+    def __init__(self, out_put):
+        super(Net1, self).__init__()
+        self.fc = nn.Linear(2, 32)
+        self.output_layer = nn.Linear(32, out_put)
+        self.relu = nn.ReLU()
+     def forward(self, x):
+        x = self.fc(x)
+        x = self.relu(x)
+        x = self.output_layer(x)
+        return x
+
+n_samples = 1000
+X, y = datasets.make_circles(n_samples=n_samples, factor=0.5, noise=0.05)
+
+psc = PSC(
+    model=Net1(2),
+    clustering_method=cluster.KMeans(n_clusters=2, n_init=10, verbose=False),
+    sampling_ratio=0,
+    n_components=2,
+    n_neighbor=10,
+    batch_size_data=len(X)
+)
+psc.fit(X)
+y_pred = psc.predict(X)
+plt.scatter(X[:, 0], X[:, 1], c=y_pred, cmap="rainbow")
+plt.axis("equal")
+plt.show()
+plt.close()
+```
+
+Here is the clustering result.
+
+![The clustering result of the double circles dataset](./img/double_circles_cluster.png)
+
+
+### Example: Clustering Double Moons Dataset Using Python Code
+
+This double moons dataset is another challenging task for some clustering algorithms (e.g., K-means) because the shapes of the clusters are not convex.  The following shows the scatter plot and clustering results.
+
+![The clustering result of the double moonsdataset](./img/double_moons_cluster.png)
+
+Here is the sample code.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import torch.nn as nn
+
+from sklearn import cluster, datasets, mixture
+from sklearn.preprocessing import StandardScaler
+from ParametricSpectralClustering.psc import PSC
+
+class Net1(nn.Module):
+    def __init__(self, out_put):
+        super(Net1, self).__init__()
+        self.fc = nn.Linear(2, 32)
+        self.output_layer = nn.Linear(32, out_put)
+        self.relu = nn.ReLU()
+    def forward(self, x):
+        x = self.fc(x)
+        x = self.relu(x)
+        x = self.output_layer(x)
+        return x
+
+n_samples = 1000
+X, y = datasets.make_moons(n_samples=n_samples, noise=0.05)
+
+psc = PSC(
+    model=Net1(2),
+    clustering_method=cluster.KMeans(n_clusters=2, n_init=10, verbose=False),
+    sampling_ratio=0,
+    n_components=2,
+    n_neighbor=10,
+    batch_size_data=len(X)
+)
+psc.fit(X)
+y_pred = psc.predict(X)
+plt.scatter(X[:, 0], X[:, 1], c=y_pred, cmap="rainbow")
+plt.axis("equal")
+plt.savefig('./Figure4.png')
+plt.close()
+```
+
 ### Example: Clustering Handwritten Digits Using Python Code
 
 The following example demonstrates PSC applied to the **UCI ML handwritten digits dataset**.
