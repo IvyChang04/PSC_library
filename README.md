@@ -134,7 +134,7 @@ psc.fit(X)
 y_pred = psc.predict(X)
 plt.scatter(X[:, 0], X[:, 1], c=y_pred, cmap="rainbow")
 plt.axis("equal")
-plt.savefig('./Figure4.png')
+plt.show()
 plt.close()
 ```
 
