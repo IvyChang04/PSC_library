@@ -393,6 +393,24 @@ class PSC:
         self.__check_clustering_method()
         self.__check_model()
 
+        # check input dimension - find the first linear layer
+        input_dim = None
+        for name, module in self.model.named_modules():
+            if isinstance(module, nn.Linear):
+                input_dim = module.in_features
+                break
+        
+        if input_dim is None:
+            raise ValueError("No linear layer found in model")
+        
+        if X.shape[1] != input_dim:
+            raise ValueError(f"Input dimension {X.shape[1]} doesn't match model input dimension {input_dim}")
+        
+        # check output dimension
+        dummy_output = self.model(torch.randn(1, X.shape[1]))
+        if dummy_output.shape[1] != self.n_components:
+            raise ValueError(f"Model output dimension {dummy_output.shape[1]} doesn't match n_components {self.n_components}")
+
         X_torch = torch.from_numpy(X).type(torch.FloatTensor)
         
         # Use X_torch everywhere, convert to numpy only when needed
