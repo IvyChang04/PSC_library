@@ -393,7 +393,10 @@ class PSC:
         self.__check_clustering_method()
         self.__check_model()
 
-        x = torch.from_numpy(X).type(torch.FloatTensor)
+        X_torch = torch.from_numpy(X).type(torch.FloatTensor)
+        
+        # Use X_torch everywhere, convert to numpy only when needed
+        X_numpy = X_torch.numpy()  # Only when scikit-learn needs numpy
 
         if self.sampling_ratio >= 1 or self.sampling_ratio < 0:
             raise AttributeError(
@@ -401,12 +404,12 @@ class PSC:
             )
 
         if self.sampling_ratio == 0:
-            X_train, x_train = X, x
+            X_train, x_train = X_numpy, X_torch
 
         else:
             X_train, _, x_train, _ = train_test_split(
-                X,
-                x,
+                X_numpy,
+                X_torch,
                 test_size=self.sampling_ratio,
                 random_state=self.random_state,
             )
