@@ -24,7 +24,7 @@ X, y = datasets.make_circles(n_samples=n_samples, factor=0.5, noise=0.05)
 
 psc = PSC(
     model=Net1(2),
-    clustering_method=cluster.KMeans(n_clusters=2, n_init=10, verbose=False),
+    n_clusters=2,
     sampling_ratio=0,
     n_components=2,
     n_neighbor=10,
