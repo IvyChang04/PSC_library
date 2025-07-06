@@ -1,2 +1,6 @@
 test_double_circle_model
 test_double_half_moon_model
+test_load_model
+test_save_model
+test_save_fit_model
+
