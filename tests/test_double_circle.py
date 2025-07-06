@@ -186,7 +186,6 @@ class TestDoubleCircle(unittest.TestCase):
             with self.subTest(batch_size=batch_size):
                 psc_batch = PSC(
                     model=Net1(2),
-                    #clustering_method=cluster.KMeans(n_clusters=2, n_init=10, verbose=False),
                     n_clusters=2,
                     sampling_ratio=0,
                     n_components=2,
