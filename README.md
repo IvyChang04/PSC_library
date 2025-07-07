@@ -6,9 +6,81 @@ This repository provides a PyTorch implementation of **Parametric Spectral Clust
 
 ---
 
-## Installation
+## PSC Class Parameters
 
-### Dependencies
+The `PSC` class is the main interface for parametric spectral clustering. Here are the key parameters you can configure:
+
+### Core Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `n_clusters` | int | 10 | Number of clusters to find in the data |
+| `n_components` | int | 0 | Number of embedding dimensions. If 0, defaults to `n_clusters` |
+| `n_neighbor` | int | 8 | Number of neighbors for k-nearest neighbors graph construction |
+| `model` | torch.nn.Module | Four_layer_FNN(64,128,256,64,10) | Neural network to learn the mapping from feature space to spectral space |
+| `clustering_method` | sklearn.cluster | KMeans | Clustering algorithm to apply to the learned embeddings |
+
+### Training Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `epochs` | int | 50 | Number of training epochs for the neural network |
+| `sampling_ratio` | float | 0.3 | Proportion of data used for training (0.0 to 1.0) |
+| `batch_size_data` | int | 50 | Batch size for processing data chunks |
+| `batch_size_dataloader` | int | 20 | Batch size for neural network training |
+| `random_state` | int | None | Random seed for reproducibility |
+
+### Advanced Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `criterion` | torch.nn.modules.loss | nn.MSELoss() | Loss function for training the neural network |
+
+### Parameter Guidelines
+
+#### **n_neighbor (k-nearest neighbors)**
+- **Small datasets** (< 1000 points): 5-10
+- **Medium datasets** (1000-10000 points): 10-15  
+- **Large datasets** (> 10000 points): 15-20
+- **High-dimensional data**: May need larger values due to curse of dimensionality
+
+#### **sampling_ratio**
+- **0.0**: Use all data for training (no test split)
+- **0.1-0.3**: Standard range for most applications
+- **> 0.5**: Not recommended (insufficient training data)
+
+#### **Model Architecture**
+- **Input dimension**: Must match your data features
+- **Output dimension**: Should match `n_components` (typically equals `n_clusters`)
+- **Hidden layers**: Adjust based on data complexity
+
+#### **Clustering Method**
+- **KMeans**: Good for well-separated, spherical clusters
+- **DBSCAN**: Good for clusters of varying density
+- **AgglomerativeClustering**: Good for hierarchical relationships
+
+### Example Configuration
+
+```python
+from ParametricSpectralClustering import PSC, Four_layer_FNN
+from sklearn.cluster import KMeans
+
+# For 2D data with 3 clusters
+psc = PSC(
+    n_clusters=3,                    # Find 3 clusters
+    n_components=3,                  # 3D embedding space
+    n_neighbor=10,                   # 10 nearest neighbors
+    model=Net1(3),                   # Custom model with 3 outputs
+    clustering_method=KMeans(n_clusters=3),
+    sampling_ratio=0.1,              # Use 90% for training
+    epochs=100,                      # More training epochs
+    batch_size_data=100,             # Larger batches
+    random_state=42                  # For reproducibility
+)
+```
+
+ 
+## Dependencies
 
 PSC requires the following dependencies:
 
