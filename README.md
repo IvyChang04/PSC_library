@@ -1,10 +1,6 @@
 # Parametric Spectral Clustering
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/IvyChang04/PSC_library/blob/main/LICENSE.txt)
-[![PyPI version](https://badge.fury.io/py/psc-clustering.svg)](https://badge.fury.io/py/psc-clustering)
-[![Tests](https://github.com/IvyChang04/PSC_library/actions/workflows/main.yml/badge.svg)](https://github.com/IvyChang04/PSC_library/actions)
-
-Parametric Spectral Clustering (PSC) is a high-performance PyTorch library that makes spectral clustering feasible for big data and streaming applications. It addresses the critical challenges of traditional spectral clustering, including computational efficiency, memory consumption, and the lack of incremental learning capabilities.
+Parametric Spectral Clustering (PSC) is a high-performance library that makes spectral clustering feasible for big data and streaming applications. It addresses the critical challenges of traditional spectral clustering, including computational efficiency, memory consumption, and the lack of incremental learning capabilities.
 
 ---
 
@@ -17,14 +13,10 @@ Parametric Spectral Clustering (PSC) is a high-performance PyTorch library that 
 
 ## 📦 Installation
 
-You can install the package via pip from PyPI:
-```sh
-pip install psc-clustering
-```
+You can install the latest version directly from GitHub:
 
-Alternatively, you can install the latest version directly from GitHub:
 ```bash
-pip install git+[https://github.com/IvyChang04/PSC_library.git](https://github.com/IvyChang04/PSC_library.git)
+pip install git+https://github.com/IvyChang04/PSC_library.git
 ```
 
 ### Dependencies:
