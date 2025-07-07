@@ -56,9 +56,7 @@ plt.axis("equal")
 plt.show()
 ```
 
-```diff
-- show the figure
-```
+![double_moon](https://github.com/user-attachments/assets/eb3a0356-160b-4c96-8e12-63c77ff87a0c)
 
 ## 📚 Detailed Examples 
 <details>
@@ -109,9 +107,9 @@ plt.close()
   ```
 
 Here is the clustering result.
-```diff
-- show the figure.
-```
+
+![double_circle](https://github.com/user-attachments/assets/9b8ca0a0-6e27-4605-a972-4626dbf0bdb9)
+
 
 **Example: Clustering Handwritten Digits Using Python Code**
 
