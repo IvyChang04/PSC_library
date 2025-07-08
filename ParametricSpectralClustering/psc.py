@@ -393,7 +393,28 @@ class PSC:
         self.__check_clustering_method()
         self.__check_model()
 
-        x = torch.from_numpy(X).type(torch.FloatTensor)
+        # check input dimension - find the first linear layer
+        input_dim = None
+        for name, module in self.model.named_modules():
+            if isinstance(module, nn.Linear):
+                input_dim = module.in_features
+                break
+        
+        if input_dim is None:
+            raise ValueError("No linear layer found in model")
+        
+        if X.shape[1] != input_dim:
+            raise ValueError(f"Input dimension {X.shape[1]} doesn't match model input dimension {input_dim}")
+        
+        # check output dimension
+        dummy_output = self.model(torch.randn(1, X.shape[1]))
+        if dummy_output.shape[1] != self.n_components:
+            raise ValueError(f"Model output dimension {dummy_output.shape[1]} doesn't match n_components {self.n_components}")
+
+        X_torch = torch.from_numpy(X).type(torch.FloatTensor)
+        
+        # Use X_torch everywhere, convert to numpy only when needed
+        X_numpy = X_torch.numpy()  # Only when scikit-learn needs numpy
 
         if self.sampling_ratio >= 1 or self.sampling_ratio < 0:
             raise AttributeError(
@@ -401,12 +422,12 @@ class PSC:
             )
 
         if self.sampling_ratio == 0:
-            X_train, x_train = X, x
+            X_train, x_train = X_numpy, X_torch
 
         else:
             X_train, _, x_train, _ = train_test_split(
-                X,
-                x,
+                X_numpy,
+                X_torch,
                 test_size=self.sampling_ratio,
                 random_state=self.random_state,
             )

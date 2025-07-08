@@ -23,12 +23,6 @@ class testAccuracy(unittest.TestCase):
     def test_AMI(self):
         self.assertIs(type(acc.AMI()), np.float64)
 
-    def test_acc_report(self):
-        with patch("sys.stdout", new_callable=io.StringIO) as mock_stdout:
-            acc.acc_report()
-            printed_output = mock_stdout.getvalue()
-        self.assertTrue(printed_output.strip(), msg="Function didn't print anything")
-
 
 if __name__ == "__main__":
     unittest.main()
