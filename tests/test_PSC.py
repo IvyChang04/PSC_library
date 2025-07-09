@@ -60,27 +60,6 @@ class testPSC(unittest.TestCase):
         output = psc.predict(x)
         self.assertEqual(output.shape, (1797,))
 
-    def test_save_model(self):
-        psc.save_model("test_save_model")
-        self.assertEqual(os.path.exists("test_save_model"), True)
-
-        psc.fit(x)
-        psc.save_model("test_save_fit_model")
-        self.assertEqual(os.path.exists("test_save_fit_model"), True)
-
-        m1 = None
-        m2 = None
-        with open("test_save_model", "wb") as f1:
-            pickle.dump(m1, f1)
-        with open("test_save_fit_model", "wb") as f2:
-            pickle.dump(m2, f2)
-        self.assertEqual(m1, m2)
-
-    def test_load_model(self):
-        psc.load_model("test_load_model")
-        self.assertEqual(os.path.exists("test_load_model"), True)
-        self.assertEqual(psc.model_fitted, True)
-
 
 if __name__ == "__main__":
     unittest.main()

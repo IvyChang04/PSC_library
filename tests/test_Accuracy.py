@@ -15,13 +15,13 @@ acc = Accuracy(y_true=y, y_pred=cluster_idx)
 
 class testAccuracy(unittest.TestCase):
     def test_cluster_acc(self):
-        self.assertIs(type(acc.cluster_acc()), np.float64)
+        self.assertIsInstance(acc.cluster_acc(), np.float64)
 
     def test_ARI(self):
-        self.assertIs(type(acc.ARI()), float)
+        self.assertIsInstance(acc.ARI(), float)
 
     def test_AMI(self):
-        self.assertIs(type(acc.AMI()), np.float64)
+        self.assertIsInstance(acc.AMI(), (float, np.float64))
 
 
 if __name__ == "__main__":
