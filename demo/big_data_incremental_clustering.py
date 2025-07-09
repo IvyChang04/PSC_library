@@ -1,3 +1,4 @@
+import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -5,6 +6,10 @@ import torch.nn as nn
 from sklearn import cluster
 from sklearn.datasets import make_blobs
 from ParametricSpectralClustering import PSC
+
+# Suppress the specific warning
+warnings.filterwarnings("ignore", message="Graph is not fully connected, spectral embedding may not work as expected.")
+
 
 # learn the mapping from feature space to spectral space
 class Net1(nn.Module):
@@ -30,8 +35,8 @@ psc = PSC(
     n_components=3,
     random_state=123,
     sampling_ratio=0.01)
+print(f"Start training a PSC cluster with {X_train.shape[0]} samples and a sampling ratio of {psc.sampling_ratio}")
 start_time = time.time()
-print(X_train.shape)
 psc.fit(X_train)
 end_time = time.time()
 print(f"PSC training time: {end_time - start_time:.2f} seconds")
@@ -40,6 +45,7 @@ print(f"PSC training time: {end_time - start_time:.2f} seconds")
 X_new, y_new = make_blobs(n_samples=1000, centers=3, n_features=2, 
                           random_state=42, cluster_std=1.5)
 
+print(f"Start clustering {X_new.shape[0]} new samples")
 time_start = time.time()
 new_labels = psc.predict(X_new)
 end_time = time.time()
